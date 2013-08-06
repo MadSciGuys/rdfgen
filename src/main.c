@@ -12,25 +12,26 @@ int main(int argc,char *argv[])
 	FILE *outputfile;
 
 	//Allocate memory for filenames:
-	char *inputfilename = malloc(1000);
+	char *inputfilename = malloc(100);
 	if(inputfilename == NULL)
 	{
 		printf("Couldn't allocate memory for *inputfilename.\n");
 		return 0;
 	}
-	char *outputfilename = malloc(1000);
+	char *outputfilename = malloc(35);
 	if(outputfilename == NULL)
 	{
 		printf("Couldn't allocate memory for *outputfilename.\n");
 		return 0;
 	}
-	char *tablename = malloc(1000);
+	char *tablename = malloc(31);
 	if(tablename == NULL)
 	{
 		printf("Couldn't allocate memory for *tablename.\n");
 		return 0;
 	}
 
+	//Make sure there is an argument:
 	if(argv[1] == NULL)
 	{
 		printf("Too few arguments.\n");
@@ -38,8 +39,8 @@ int main(int argc,char *argv[])
 	}
 
 	//Copy the arg and build the output filename:
-	strncpy(inputfilename,argv[1],999);
-	*(inputfilename+999) = '\0';
+	strncpy(inputfilename,argv[1],99);
+	*(inputfilename+99) = '\0';
 	OutputFilename(inputfilename,outputfilename,tablename);
 
 	//Open the files:
@@ -58,9 +59,21 @@ int main(int argc,char *argv[])
 	}
 	free(outputfilename);
 
-	fprintf(outputfile,"It works!\nThis is the output RDF file.");
-	fclose(inputfile);
-	fclose(outputfile);
+	//Allocate memory for the 2D array of column names:
+	char *columnames = malloc(31000); //30 chars * 1000 max cols
+	if(columnames == NULL)
+	{
+		printf("Couldn't allocate memory for *columnames.\n");
+	}
+
+	char *firstline = malloc(512000);
+	if(columnames == NULL)
+	{
+		printf("Couldn't allocate memory for *firstline.\n");
+	}
+	getLine(inputfile,firstline,512000);
+
+	printf("%s\n",firstline);
 
 	return 0;
 }
