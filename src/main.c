@@ -1,3 +1,6 @@
+// Travis Whitaker 2013
+// twhitak@its.jnj.com
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -72,23 +75,7 @@ int main(int argc,char *argv[])
 		printf("Couldn't allocate memory for *firstline.\n");
 	}
 	getLine(inputfile,firstline,512000);
-	printf("%s\n\n",firstline);
 
 	getColNames(firstline,columnames);
-
-	for(unsigned register int i=0;i<1000;i++)
-	{
-		if(*(columnames+i) == '\0')
-		{
-			printf("#");
-		}
-		else
-		{
-			char current = *(columnames+i);
-			printf("%c",current);
-		}
-	}
-	printf("\n\n");
-
 	return 0;
 }

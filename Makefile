@@ -1,3 +1,6 @@
+# Travis Whitaker 2012
+# twhitak@its.jnj.com
+
 CC = clang
 CFLAGS = -O2
 SOURCE = src/*.c

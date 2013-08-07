@@ -1,3 +1,6 @@
+// Travis Whitaker 2013
+// twhitak@its.jnj.com
+
 #include <stdio.h>
 #include <string.h>
 
