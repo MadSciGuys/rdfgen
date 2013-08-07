@@ -34,10 +34,15 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 
-	//Make sure there is an argument:
+	//Make sure there is only one argument:
 	if(argv[1] == NULL)
 	{
 		printf("Too few arguments.\n");
+		return 0;
+	}
+	else if(argv[2] != NULL)
+	{
+		printf("Too many arguments.\n");
 		return 0;
 	}
 

@@ -2,20 +2,22 @@
 # twhitak@its.jnj.com
 
 CC = clang
-CFLAGS = -O2
-SOURCE = src/*.c
+CFLAGS =
 INCLUDE = -I./include
-OUT = -o
 EXECUTABLE = rdfgen
 
-all:
-	$(CC) $(CFLAGS) $(INCLUDE) $(OUT) $(EXECUTABLE) $(SOURCE)
+all: rdfgen.o fileIO.o
+	$(CC) $(CFLAGS) $(INCLUDE) -o $(EXECUTABLE) src/main.c rdfgen.o fileIO.o
+
+rdfgen.o:
+	$(CC) -c $(INCLUDE) src/rdfgen.c
+
+fileIO.o:
+	$(CC) -c $(INCLUDE) src/fileIO.c
 
 install:
-	cp $(EXECUTABLE) /usr/local/bin
-
-uninstall:
-	rm -f /usr/local/bin/$(EXECUTABLE)
+	cp $(EXECUTABLE) /usr/bin/local/
 
 clean:
+	rm -f *.o
 	rm -f $(EXECUTABLE)
