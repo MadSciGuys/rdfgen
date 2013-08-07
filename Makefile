@@ -10,16 +10,16 @@ all: rdfgen.o fileIO.o
 	$(CC) $(CFLAGS) $(INCLUDE) -o $(EXECUTABLE) src/main.c rdfgen.o fileIO.o
 
 rdfgen.o:
-	$(CC) -c $(INCLUDE) src/rdfgen.c
+	$(CC) -c $(CFLAGS) $(INCLUDE) src/rdfgen.c
 
 fileIO.o:
-	$(CC) -c $(INCLUDE) src/fileIO.c
+	$(CC) -c $(CFLAGS) $(INCLUDE) src/fileIO.c
 
 install:
-	cp $(EXECUTABLE) /usr/bin/local/
+	cp $(EXECUTABLE) /usr/local/bin/
 
 uninstall:
-	rm -f /usr/bin/local$(EXECUTABLE)
+	rm -f /usr/local/bin/$(EXECUTABLE)
 
 clean:
 	rm -f *.o
