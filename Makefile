@@ -18,6 +18,9 @@ fileIO.o:
 install:
 	cp $(EXECUTABLE) /usr/bin/local/
 
+uninstall:
+	rm -f /usr/bin/local$(EXECUTABLE)
+
 clean:
 	rm -f *.o
 	rm -f $(EXECUTABLE)
