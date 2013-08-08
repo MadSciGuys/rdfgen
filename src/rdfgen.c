@@ -2,14 +2,16 @@
 // twhitak@its.jnj.com
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <rdfgen.h>
 
-void getColNames(char *firstline, char *columnames)
+int getColNames(char *firstline, char *columnames)
 {
+	int colnum = 1;
 	unsigned register int j=0;
-	unsigned register int jmp=30;
+	int jmp=29;
 	for(unsigned register int i=0;i<31000;i++)
 	{
 		if(*(firstline+j) == '\0')
@@ -18,17 +20,24 @@ void getColNames(char *firstline, char *columnames)
 		}
 		else if(*(firstline+j) == ',' || *(firstline+j) == '\n')
 		{
-			*(columnames+i) = '\0';
 			i = i+jmp;
 			jmp = 30;
+			colnum++;
 		}
 		else
 		{
 			*(columnames+i) = *(firstline+j);
 		}
 		j++;
+		if(jmp < 0)
+		{
+			printf("ERROR: Name of column %d greater than 30 chars.\n",colnum);
+			free(columnames);
+			columnames = NULL;
+			return -1;
+		}
 		jmp--;
 	}
-	return;
+	return colnum;
 
 }

@@ -81,6 +81,11 @@ int main(int argc,char *argv[])
 	}
 	getLine(inputfile,firstline,512000);
 
-	getColNames(firstline,columnames);
+	int colnum = getColNames(firstline,columnames);
+	if(colnum == -1)
+	{
+		printf("FATAL ERROR.\n");
+		return 0;
+	}
 	return 0;
 }
