@@ -50,7 +50,7 @@ int main(int argc,char *argv[])
 	strncpy(inputfilename,argv[1],99);
 	*(inputfilename+99) = '\0';
 	printf("Input filename: %s\n",inputfilename);
-	OutputFilename(inputfilename,outputfilename,tablename);
+	outputFilename(inputfilename,outputfilename,tablename);
 	printf("Table name: %s\n",tablename);
 	printf("Output filename: %s\n",outputfilename);
 
