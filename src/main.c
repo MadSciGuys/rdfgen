@@ -75,17 +75,8 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 
-	//Allocate memory for one line:
-	char *line = malloc(4001000); //(4000 chars + comma)*1000 max cols
-	if(line == NULL)
-	{
-		printf("Couldn't allocate memory for *line.\nFATAL ERROR\n");
-		return 0;
-	}
-	getLine(inputfile,line,4001000);
-
 	//Get the names and number of columns:
-	int colnum = getColNames(line,columnames);
+	int colnum = getColNames(inputfile,columnames);
 	if(colnum == -1)
 	{
 		printf("FATAL ERROR.\n");
@@ -94,6 +85,14 @@ int main(int argc,char *argv[])
 
 	//Print the RDF header to the output file:
 	outputHeader(outputfile,tablename,colnum,columnames);
+	fprintf(outputfile,"\n");
+
+	//THIS IS THE IMPORTANT PART!
+	//Print the triples for each column:
+//	outputTriples(outputfile,inputfile,line,maxlinelength,tablename,colnum,columnames);
+
+	//Output the footer:
+	outputFooter(outputfile);
 
 	//Close the files:
 	fclose(inputfile);

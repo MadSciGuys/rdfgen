@@ -4,7 +4,9 @@
 #ifndef RDFGEN_H
 #define RDFGEN_H
 
-int getColNames(char *firstline, char*columnames);
+int getColNames(FILE *inputfile, char *columnames);
 void outputHeader(FILE *outputfile, char *tablename, int colnum, char *columnames);
+void outputFooter(FILE *outputfile);
+void outputTriples(FILE *outputfile, FILE *inputfile, char *line, int maxlinelength, char *tablename, char *colnum, char *columnames);
 
 #endif

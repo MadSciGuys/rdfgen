@@ -30,19 +30,3 @@ void outputFilename(char *inputfilename, char *outputfilename, char *tablename)
 	*(outputfilename+34) = '\0';
 	return;
 }
-
-void getLine(FILE *file, char *output, unsigned int maxlength)
-{
-	char cursor;
-	for(unsigned register int i=0;i<maxlength;i++)
-	{
-		cursor = fgetc(file);
-		if(cursor == '\n' || cursor == '\0' || cursor == EOF)
-		{
-			*(output+i) = '\0';
-			break;
-		}
-		*(output+i) = cursor;
-	}
-	return;
-}

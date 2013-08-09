@@ -7,18 +7,21 @@
 
 #include <rdfgen.h>
 
-int getColNames(char *firstline, char *columnames)
+int getColNames(FILE *inputfile, char *columnames)
 {
 	int colnum = 1;
-	unsigned register int j=0;
+	char cursor;
+	char EOL = 0x00;
 	int jmp=30;
-	for(unsigned register int i=0;i<31000;i++)
+	for(unsigned register int i=0;i<30999;i++)
 	{
-		if(*(firstline+j) == '\0')
+		cursor = fgetc(inputfile);
+		if(cursor == '\n' || cursor == EOF)
 		{
+			EOL = 0xFF;
 			break;
 		}
-		else if(*(firstline+j) == ',' || *(firstline+j) == '\n')
+		else if(cursor == ',')
 		{
 			i = i+jmp;
 			jmp = 31;
@@ -26,18 +29,30 @@ int getColNames(char *firstline, char *columnames)
 		}
 		else
 		{
-			*(columnames+i) = *(firstline+j);
+			*(columnames+i) = cursor;
 		}
-		j++;
 		if(jmp == 0)
 		{
-			printf("ERROR: Name of column %d greater than 30 chars.\n",colnum);
+			printf("Name of column %d greater than 30 characters.\n",colnum);
 			free(columnames);
 			columnames = NULL;
 			return -1;
 		}
 		jmp--;
 	}
+	if(EOL == 0x00)
+	{
+		cursor = fgetc(inputfile);
+		if(!(cursor == '\n' || cursor == EOF))
+		{
+			printf("First line must have no more than 31000 characters.\n");
+			free(columnames);
+			columnames = NULL;
+			return -1;
+		}
+		ungetc(cursor,inputfile);
+	}
+	*(columnames+30999)='\0';
 	return colnum;
 }
 
@@ -55,3 +70,10 @@ void outputHeader(FILE *outputfile, char *tablename, int colnum, char *columname
 
 	return;
 }
+
+void outputFooter(FILE *outputfile)
+{
+	fprintf(outputfile,"</rdf:RDF>");
+}
+
+void outputTriples(FILE *outputfile, FILE *inputfile, char *line, int maxlinelength, char *tablename, char *colnum, char *columnames);
