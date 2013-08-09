@@ -6,7 +6,7 @@
 
 #include <fileIO.h>
 
-void OutputFilename(char *inputfilename, char *outputfilename, char *tablename)
+void outputFilename(char *inputfilename, char *outputfilename, char *tablename)
 {
 	for(unsigned register int i=0; i<30;i++)
 	{
