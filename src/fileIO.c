@@ -37,7 +37,7 @@ void getLine(FILE *file, char *output, unsigned int maxlength)
 	for(unsigned register int i=0;i<maxlength;i++)
 	{
 		cursor = fgetc(file);
-		if(cursor == '\n')
+		if(cursor == '\n' || cursor == '\0' || cursor == EOF)
 		{
 			*(output+i) = '\0';
 			break;

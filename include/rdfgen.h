@@ -5,5 +5,6 @@
 #define RDFGEN_H
 
 int getColNames(char *firstline, char*columnames);
+void outputHeader(FILE *outputfile, char *tablename, char*columnames);
 
 #endif

@@ -75,19 +75,28 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 
-	char *firstline = malloc(512000);
+	//Allocate memory for one line:
+	char *line = malloc(4001000); //(4000 chars + comma)*1000 max cols
 	if(columnames == NULL)
 	{
-		printf("Couldn't allocate memory for *firstline.\nFATAL ERROR\N");
+		printf("Couldn't allocate memory for *line.\nFATAL ERROR\n");
 		return 0;
 	}
-	getLine(inputfile,firstline,512000);
+	getLine(inputfile,line,4001000);
 
-	int colnum = getColNames(firstline,columnames);
+	//Get the names and number of columns:
+	int colnum = getColNames(line,columnames);
 	if(colnum == -1)
 	{
 		printf("FATAL ERROR.\n");
 		return 0;
 	}
+
+	//Print the RDF header to the output file:
+	outputHeader(outputfile,tablename,columnames);
+
+	//Close the files:
+	fclose(inputfile);
+	fclose(outputfile);
 	return 0;
 }

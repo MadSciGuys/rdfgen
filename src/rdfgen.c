@@ -12,7 +12,7 @@ int getColNames(char *firstline, char *columnames)
 	int colnum = 1;
 	unsigned register int j=0;
 	int jmp=29;
-	for(unsigned register int i=0;i<31000;i++)
+	for(unsigned register int i=0;i<30000;i++)
 	{
 		if(*(firstline+j) == '\0')
 		{
@@ -39,5 +39,10 @@ int getColNames(char *firstline, char *columnames)
 		jmp--;
 	}
 	return colnum;
+}
 
+void outputHeader(FILE *outputfile, char *tablename, char *columnames)
+{
+	fprintf(outputfile,"<?xml version=\"1.0\"?>\n<!DOCTYPE rdf:RDF [<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\">]>\n<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://example.org/schemas/vehicles\"\n  xmlns:dwh=\"http://www.jnj.com/dwh#\">\n<rdfs:Datatype rdf:about=\"&xsd;string\">\n\n<rdfs:Class rdf:ID=");
+	return;
 }
