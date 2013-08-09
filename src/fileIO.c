@@ -8,7 +8,7 @@
 
 void OutputFilename(char *inputfilename, char *outputfilename, char *tablename)
 {
-	for(unsigned register int i=0; i<100;i++)
+	for(unsigned register int i=0; i<30;i++)
 	{
 		if(*(inputfilename+i) == '.' || *(inputfilename+i) == '\0')
 		{

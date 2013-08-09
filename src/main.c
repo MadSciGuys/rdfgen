@@ -49,9 +49,13 @@ int main(int argc,char *argv[])
 	//Copy the arg and build the output filename:
 	strncpy(inputfilename,argv[1],99);
 	*(inputfilename+99) = '\0';
+	printf("Input filename: %s\n",inputfilename);
 	OutputFilename(inputfilename,outputfilename,tablename);
+	printf("Table name: %s\n",tablename);
+	printf("Output filename: %s\n",outputfilename);
 
 	//Open the files:
+	printf("Opening input file...\n");
 	inputfile = fopen(inputfilename,"r");
 	if(inputfile == NULL)
 	{
@@ -59,6 +63,7 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 	free(inputfilename);
+	printf("Opening output file...\n");
 	outputfile = fopen(outputfilename,"w");
 	if(outputfile == NULL)
 	{
@@ -68,7 +73,8 @@ int main(int argc,char *argv[])
 	free(outputfilename);
 
 	//Allocate memory for the 2D array of column names:
-	char *columnames = malloc(30000); //30 chars * 1000 max cols
+	printf("Allocating memory for *columnames...\n");
+	char *columnames = malloc(31000); //(30 chars + \0) * 1000 max cols
 	if(columnames == NULL)
 	{
 		printf("Couldn't allocate memory for *columnames.\nFATAL ERROR\n");
@@ -76,13 +82,17 @@ int main(int argc,char *argv[])
 	}
 
 	//Allocate memory for one line:
+	printf("Allocating memory for *line...\n");
 	char *line = malloc(4001000); //(4000 chars + comma)*1000 max cols
-	if(columnames == NULL)
+	printf("malloc returned.\n");
+	if(line == NULL)
 	{
 		printf("Couldn't allocate memory for *line.\nFATAL ERROR\n");
 		return 0;
 	}
+	printf("About to get first line.\n");
 	getLine(inputfile,line,4001000);
+	printf("Got first line.\n");
 
 	//Get the names and number of columns:
 	int colnum = getColNames(line,columnames);
@@ -91,6 +101,7 @@ int main(int argc,char *argv[])
 		printf("FATAL ERROR.\n");
 		return 0;
 	}
+	printf("Got column names.\n");
 
 	//Print the RDF header to the output file:
 	outputHeader(outputfile,tablename,columnames);

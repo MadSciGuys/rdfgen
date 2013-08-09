@@ -11,8 +11,8 @@ int getColNames(char *firstline, char *columnames)
 {
 	int colnum = 1;
 	unsigned register int j=0;
-	int jmp=29;
-	for(unsigned register int i=0;i<30000;i++)
+	int jmp=30;
+	for(unsigned register int i=0;i<31000;i++)
 	{
 		if(*(firstline+j) == '\0')
 		{
@@ -21,7 +21,7 @@ int getColNames(char *firstline, char *columnames)
 		else if(*(firstline+j) == ',' || *(firstline+j) == '\n')
 		{
 			i = i+jmp;
-			jmp = 30;
+			jmp = 31;
 			colnum++;
 		}
 		else
@@ -29,7 +29,7 @@ int getColNames(char *firstline, char *columnames)
 			*(columnames+i) = *(firstline+j);
 		}
 		j++;
-		if(jmp < 0)
+		if(jmp == 0)
 		{
 			printf("ERROR: Name of column %d greater than 30 chars.\n",colnum);
 			free(columnames);
@@ -43,6 +43,10 @@ int getColNames(char *firstline, char *columnames)
 
 void outputHeader(FILE *outputfile, char *tablename, char *columnames)
 {
-	fprintf(outputfile,"<?xml version=\"1.0\"?>\n<!DOCTYPE rdf:RDF [<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\">]>\n<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://example.org/schemas/vehicles\"\n  xmlns:dwh=\"http://www.jnj.com/dwh#\">\n<rdfs:Datatype rdf:about=\"&xsd;string\">\n\n<rdfs:Class rdf:ID=");
+	fprintf(outputfile,"<?xml version=\"1.0\"?>\n<!DOCTYPE rdf:RDF [<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\">]>\n<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://example.org/schemas/vehicles\"\n  xmlns:dwh=\"http://www.jnj.com/dwh#\">\n<rdfs:Datatype rdf:about=\"&xsd;string\">\n\n<rdfs:Class rdf:ID=\"");
+
+	fprintf(outputfile,"%s",tablename);
+	fprintf(outputfile,"\"/>\n\n");
+
 	return;
 }
