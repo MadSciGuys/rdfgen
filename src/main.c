@@ -93,7 +93,7 @@ int main(int argc,char *argv[])
 	}
 
 	//Print the RDF header to the output file:
-	outputHeader(outputfile,tablename,columnames);
+	outputHeader(outputfile,tablename,colnum,columnames);
 
 	//Close the files:
 	fclose(inputfile);
