@@ -89,7 +89,11 @@ int main(int argc,char *argv[])
 
 	//THIS IS THE IMPORTANT PART!
 	//Print the triples for each column:
-	outputTriples(outputfile,inputfile,tablename,colnum,columnames);
+	if(outputTriples(outputfile,inputfile,tablename,colnum,columnames) == 1)
+	{
+		printf("FATAL ERROR\n");
+		return 0;
+	}
 	fprintf(outputfile,"\n\n");
 
 	//Output the footer:

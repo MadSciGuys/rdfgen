@@ -75,66 +75,94 @@ void outputFooter(FILE *outputfile)
 {
 	fprintf(outputfile,"</rdf:RDF>");
 }
-/*
+
 int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum, char *columnames)
 {
-	char cursor = fgetc(inputfile);
-	char row_id[31];
-	row_id[0] = '\0';
-	if(cursor == EOF)
+	int colmax = colnum-1; //Minimize use of arithmetic in the main loop.
+	char cursor;
+	char *current_colname = NULL; //Minimize use of arithmetic in the main loop.
+	do
 	{
-		return 0;
-	}
-	while(cursor != EOF)
-	{
-		for(unsigned register int i=0;i<31;i++)
+		//Print start tag for row:
+		fprintf(outputfile,"<dwh:%s rdf:ID=\"%s",tablename,tablename);
+		do
 		{
-			if(cursor == ',')
+			cursor = fgetc(inputfile);
+			//Check to see that the line doesn't end here,
+			//this happens if you forget to use csvgen first:
+			switch(cursor)
 			{
-				if(row_id[0] == '\0')
-				{
-					goto earlyEOL;
-				}
-				EOR = 0xFF;
+			case '\n':
+			case EOF:
+				goto malformedFile;
+				break;
+			default:
 				break;
 			}
-			row_id[i] = cursor;
-			cursor = fgetc(inputfile);
-			if(cursor == EOF || cursor == '\n')
+			if(cursor == ',')
 			{
-				goto earlyEOL;
+				break;
 			}
-		}
-		row_id[30] = '\0';
-		fprintf(outputfile,"<dwh:%s rdf:ID=\"%s%s\">\n",tablename,tablename,row_id);
+			else
+			{
+				fprintf(outputfile,"%c",cursor);
+			}
+		} while(cursor != EOF);
+		fprintf(outputfile,"\">\n"); //Close the row start tag.
+		//Now we're going to write the tags for each column:
 		for(unsigned register int i=1;i<colnum;i++)
 		{
-			fprintf(outputfile,"  <dwh:%s~%s rdf:datatype=\"&xsd;string\">",tablename,columnames+i);
-			for(unsigned register int j=0;j<4001;j++)
+			current_colname = columnames+(i*31); //Update the column name pointer.
+			//Start the property tag:
+			fprintf(outputfile,"  <dwh:%s~%s rdf:datatype=\"&xsd;string\">",tablename,current_colname);
+			//Now we're going to get the data:
+			do
 			{
 				cursor = fgetc(inputfile);
-				if(cursor == ',')
+				//Make sure the line doesn't end prematurely,
+				//usually happens if csvgen wasn't run properly:
+				switch(cursor)
+				{
+				case '\n':
+				case EOF:
+					if(i != (colnum-1))
+					{
+						goto malformedFile;
+					}
+					break;
+				default:
+					break;
+				}
+				if(cursor == ',' || cursor == '\n')
 				{
 					break;
 				}
-				if(cursor == EOF || cursor == '\n')
+				else
 				{
-					if(i == colnum)
-					{
-						break;
-					}
-					goto earlyEOL;
+					fprintf(outputfile,"%c",cursor);
 				}
-				fputc(cursor,outputfile);
-			}
-	}
-	earlyEOL:
-		printf("Malformed line, check output file.\n");
+			} while(cursor != EOF);
+			fprintf(outputfile,"</dwh:%s~%s>\n",tablename,current_colname);
+		}
+		fprintf(outputfile,"</dwh:%s>\n\n",tablename);
+		cursor = fgetc(inputfile);
+		if(cursor == EOF)
+		{
+			break;
+		}
+		else
+		{
+			ungetc(cursor,inputfile);
+		}
+	} while(cursor != EOF);
+	return 0;
+
+	//We jump here if anything terrible happens:
+	malformedFile:
+		printf("File is malformed, check output file.\n");
 		fclose(inputfile);
 		fclose(outputfile);
 		free(tablename);
 		free(columnames);
-		tablename = NULL;
-		columnames = NULL;
-		return -1;
-*/
+		return 1;
+}

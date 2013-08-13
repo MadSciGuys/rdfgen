@@ -7,6 +7,6 @@
 int getColNames(FILE *inputfile, char *columnames);
 void outputHeader(FILE *outputfile, char *tablename, int colnum, char *columnames);
 void outputFooter(FILE *outputfile);
-void outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum, char *columnames);
+int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum, char *columnames);
 
 #endif
