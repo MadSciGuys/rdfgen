@@ -84,7 +84,15 @@ int main(int argc,char *argv[])
 	}
 
 	//Print the RDF header to the output file:
-	outputHeader(outputfile,tablename,colnum,columnames);
+	if(columnames[0] == 'I' && columnames [1] == 'D' && columnames[2] == '\0')
+	{
+		outputHeader(outputfile,tablename,colnum,columnames);
+	}
+	else
+	{
+		printf("Tables without ID not yet implemented...\n");
+		return 0;
+	}
 	fprintf(outputfile,"\n\n");
 
 	//THIS IS THE IMPORTANT PART!
