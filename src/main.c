@@ -37,12 +37,12 @@ int main(int argc,char *argv[])
 	//Make sure there is only one argument:
 	if(argv[1] == NULL)
 	{
-		printf("Too few arguments.\nUsage: rdfgen filename");
+		printf("Too few arguments.\nUsage: rdfgen filename\n");
 		return 0;
 	}
 	else if(argv[2] != NULL)
 	{
-		printf("Too many arguments.\nUsage: rdfgen filename");
+		printf("Too many arguments.\nUsage: rdfgen filename\n");
 		return 0;
 	}
 

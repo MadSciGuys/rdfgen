@@ -63,7 +63,7 @@ void outputHeader(FILE *outputfile, char *tablename, int colnum, char *columname
 	fprintf(outputfile,"%s",tablename);
 	fprintf(outputfile,"\"/>\n\n");
 
-	for(unsigned register int i=0;i<colnum;i++)
+	for(unsigned register int i=1;i<colnum;i++) //Skip the first name if the ID is present.
 	{
 		fprintf(outputfile,"<rdf:Property rdf:ID=\"%s~%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"&xsd;string\"/>\n</rdf:Property>\n\n",tablename,columnames+i*31,tablename);
 	}
