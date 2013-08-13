@@ -58,14 +58,14 @@ int getColNames(FILE *inputfile, char *columnames)
 
 void outputHeader(FILE *outputfile, char *tablename, int colnum, char *columnames)
 {
-	fprintf(outputfile,"<?xml version=\"1.0\"?>\n<!DOCTYPE rdf:RDF [<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\">]>\n<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://www.jnj.com/dwh/tables#\"\n  xmlns:dwh=\"http://www.jnj.com/dwh#\">\n<rdfs:Datatype rdf:about=\"&xsd;string\">\n\n<rdfs:Class rdf:ID=\"");
+	fprintf(outputfile,"<?xml version=\"1.0\"?>\n<!DOCTYPE rdf:RDF [<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\">]>\n<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://www.jnj.com/dwh/tables#\"\n  xmlns:dwh=\"http://www.jnj.com/dwh#\">\n\n\n<rdfs:Class rdf:ID=\"");
 
 	fprintf(outputfile,"%s",tablename);
 	fprintf(outputfile,"\"/>\n\n");
 
 	for(unsigned register int i=1;i<colnum;i++) //Skip the first name if the ID is present.
 	{
-		fprintf(outputfile,"<rdf:Property rdf:ID=\"%s~%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"&xsd;string\"/>\n</rdf:Property>\n\n",tablename,columnames+i*31,tablename);
+		fprintf(outputfile,"<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n",tablename,columnames+i*31,tablename);
 	}
 
 	return;
@@ -80,7 +80,7 @@ int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum
 {
 	int colmax = colnum-1; //Minimize use of arithmetic in the main loop.
 	char cursor;
-	char *current_colname = NULL; //Minimize use of arithmetic in the main loop.
+	char *current_colname = NULL;
 	do
 	{
 		//Print start tag for row:
@@ -114,7 +114,7 @@ int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum
 		{
 			current_colname = columnames+(i*31); //Update the column name pointer.
 			//Start the property tag:
-			fprintf(outputfile,"  <dwh:%s~%s rdf:datatype=\"&xsd;string\">",tablename,current_colname);
+			fprintf(outputfile,"  <dwh:%s_%s>",tablename,current_colname);
 			//Now we're going to get the data:
 			do
 			{
@@ -142,7 +142,7 @@ int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum
 					fprintf(outputfile,"%c",cursor);
 				}
 			} while(cursor != EOF);
-			fprintf(outputfile,"</dwh:%s~%s>\n",tablename,current_colname);
+			fprintf(outputfile,"</dwh:%s_%s>\n",tablename,current_colname);
 		}
 		fprintf(outputfile,"</dwh:%s>\n\n",tablename);
 		cursor = fgetc(inputfile);
