@@ -75,5 +75,66 @@ void outputFooter(FILE *outputfile)
 {
 	fprintf(outputfile,"</rdf:RDF>");
 }
-
-void outputTriples(FILE *outputfile, FILE *inputfile, char *line, int maxlinelength, char *tablename, char *colnum, char *columnames);
+/*
+int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum, char *columnames)
+{
+	char cursor = fgetc(inputfile);
+	char row_id[31];
+	row_id[0] = '\0';
+	if(cursor == EOF)
+	{
+		return 0;
+	}
+	while(cursor != EOF)
+	{
+		for(unsigned register int i=0;i<31;i++)
+		{
+			if(cursor == ',')
+			{
+				if(row_id[0] == '\0')
+				{
+					goto earlyEOL;
+				}
+				EOR = 0xFF;
+				break;
+			}
+			row_id[i] = cursor;
+			cursor = fgetc(inputfile);
+			if(cursor == EOF || cursor == '\n')
+			{
+				goto earlyEOL;
+			}
+		}
+		row_id[30] = '\0';
+		fprintf(outputfile,"<dwh:%s rdf:ID=\"%s%s\">\n",tablename,tablename,row_id);
+		for(unsigned register int i=1;i<colnum;i++)
+		{
+			fprintf(outputfile,"  <dwh:%s~%s rdf:datatype=\"&xsd;string\">",tablename,columnames+i);
+			for(unsigned register int j=0;j<4001;j++)
+			{
+				cursor = fgetc(inputfile);
+				if(cursor == ',')
+				{
+					break;
+				}
+				if(cursor == EOF || cursor == '\n')
+				{
+					if(i == colnum)
+					{
+						break;
+					}
+					goto earlyEOL;
+				}
+				fputc(cursor,outputfile);
+			}
+	}
+	earlyEOL:
+		printf("Malformed line, check output file.\n");
+		fclose(inputfile);
+		fclose(outputfile);
+		free(tablename);
+		free(columnames);
+		tablename = NULL;
+		columnames = NULL;
+		return -1;
+*/

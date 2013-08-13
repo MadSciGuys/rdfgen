@@ -85,11 +85,12 @@ int main(int argc,char *argv[])
 
 	//Print the RDF header to the output file:
 	outputHeader(outputfile,tablename,colnum,columnames);
-	fprintf(outputfile,"\n");
+	fprintf(outputfile,"\n\n");
 
 	//THIS IS THE IMPORTANT PART!
 	//Print the triples for each column:
-//	outputTriples(outputfile,inputfile,line,maxlinelength,tablename,colnum,columnames);
+	outputTriples(outputfile,inputfile,tablename,colnum,columnames);
+	fprintf(outputfile,"\n\n");
 
 	//Output the footer:
 	outputFooter(outputfile);
