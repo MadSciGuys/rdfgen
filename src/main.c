@@ -12,6 +12,7 @@ int main(int argc,char *argv[])
 {
 	FILE *inputfile;
 	FILE *outputfile;
+	FILE *schemafile;
 
 	char *inputfilename = malloc(256);
 	if(inputfilename == NULL)
@@ -34,16 +35,16 @@ int main(int argc,char *argv[])
 
 	if(argv[1] == NULL)
 	{
-		printf("Too few arguments.\nUsage: rdfgen filename\n");
+		printf("Too few arguments.\nUsage: rdfgen schema_file_name csv_file_name\n");
 		return 0;
 	}
-	else if(argv[2] != NULL)
+	else if(argv[3] != NULL)
 	{
-		printf("Too many arguments.\nUsage: rdfgen filename\n");
+		printf("Too many arguments.\nUsage: rdfgen schema_file_name csv_file_name\n");
 		return 0;
 	}
 
-	strncpy(inputfilename,argv[1],255);
+	strncpy(inputfilename,argv[2],255);
 	*(inputfilename+255) = '\0';
 	outputFilename(inputfilename,outputfilename,tablename);
 
@@ -61,8 +62,14 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 	free(outputfilename);
+	schemafile = fopen(argv[1],"r");
+	if(schemafile == NULL)
+	{
+		printf("Couldn't open %s\nFATAL ERROR\n",argv[1]);
+		return 0;
+	}
 
-	char *columnames = malloc(31000);
+	colname_t *columnames = malloc(1000*sizeof(colname_t));
 	if(columnames == NULL)
 	{
 		printf("Couldn't allocate memory for *columnames.\nFATAL ERROR\n");
@@ -76,26 +83,59 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 
-	if(columnames[0] == 'I' && columnames [1] == 'D' && columnames[2] == '\0')
+	int isLeaf = resolveFK(schemafile,tablename,columnames);
+	if(isLeaf == -1)
 	{
-		outputHeader(outputfile,tablename,colnum,columnames);
-		fprintf(outputfile,"\n\n");
-		if(outputTriples(outputfile,inputfile,tablename,colnum,columnames) == 1)
+		printf("FATAL ERROR\n");
+		return 0;
+	}
+	else if(isLeaf == 1)
+	{
+		if(columnames->name[0] == 'I' && columnames->name[1] == 'D' && columnames->name[2] == '\0')
 		{
-			printf("FATAL ERROR\n");
-			return 0;
+			outputHeader_leaf(outputfile,tablename,colnum,columnames);
+			fprintf(outputfile,"\n\n");
+			if(outputTriples_leaf(outputfile,inputfile,tablename,colnum,columnames) == 1)
+			{
+				printf("FATAL ERROR\n");
+				return 0;
+			}
+		}
+		else
+		{
+			outputHeader_leaf_anon(outputfile,tablename,colnum,columnames);
+			fprintf(outputfile,"\n\n");
+			if(outputTriples_leaf_anon(outputfile,inputfile,tablename,colnum,columnames) == 1)
+			{
+				printf("FATAL ERROR\n");
+				return 0;
+			}
 		}
 	}
 	else
 	{
-		outputHeader_anon(outputfile,tablename,colnum,columnames);
-		fprintf(outputfile,"\n\n");
-		if(outputTriples_anon(outputfile,inputfile,tablename,colnum,columnames) == 1)
+		if(columnames->name[0] == 'I' && columnames->name[1] == 'D' && columnames->name[2] == '\0')
 		{
-			printf("FATAL ERROR\n");
-			return 0;
+			outputHeader(outputfile,tablename,colnum,columnames);
+			fprintf(outputfile,"\n\n");
+			if(outputTriples(outputfile,inputfile,tablename,colnum,columnames) == 1)
+			{
+				printf("FATAL ERROR\n");
+				return 0;
+			}
+		}
+		else
+		{
+			outputHeader_anon(outputfile,tablename,colnum,columnames);
+			fprintf(outputfile,"\n\n");
+			if(outputTriples_anon(outputfile,inputfile,tablename,colnum,columnames) == 1)
+			{
+				printf("FATAL ERROR\n");
+				return 0;
+			}
 		}
 	}
+
 	fprintf(outputfile,"\n\n");
 
 	outputFooter(outputfile);

@@ -7,12 +7,14 @@
 
 #include <rdfgen.h>
 
-int getColNames(FILE *inputfile, char *columnames)
+int getColNames(FILE *inputfile, colname_t *columnames)
 {
 	int colnum = 1;
 	char cursor;
+	colname_t *colname = columnames;
+	int j = 0;
 	char EOL = 0x00;
-	int jmp=30;
+	int len=30;
 	for(unsigned register int i=0;i<30999;i++)
 	{
 		cursor = fgetc(inputfile);
@@ -23,22 +25,24 @@ int getColNames(FILE *inputfile, char *columnames)
 		}
 		else if(cursor == ',')
 		{
-			i = i+jmp;
-			jmp = 31;
+			j = 0;
+			len = 31;
+			colname++;
 			colnum++;
 		}
 		else
 		{
-			*(columnames+i) = cursor;
+			colname->name[j] = cursor;
+			j++;
 		}
-		if(jmp == 0)
+		if(len == 0)
 		{
 			printf("Name of column %d greater than 30 characters.\n",colnum);
 			free(columnames);
 			columnames = NULL;
 			return -1;
 		}
-		jmp--;
+		len--;
 	}
 	if(EOL == 0x00)
 	{
@@ -52,11 +56,170 @@ int getColNames(FILE *inputfile, char *columnames)
 		}
 		ungetc(cursor,inputfile);
 	}
-	*(columnames+30999)='\0';
 	return colnum;
 }
 
-void outputHeader(FILE *outputfile, char *tablename, int colnum, char *columnames)
+int resolveFK(FILE *schemafile, char *tablename, colname_t *columnames)
+{
+	char cursor = fgetc(schemafile);
+	char seek_tablename = 'n';
+	while(seek_tablename != 'y')
+	{
+		switch(cursor)
+		{
+		case EOF:
+			printf("Tablename %s not found in schema.\nAssuming %s is leaf table.\n",tablename,tablename);
+			return 1;
+		case '\n':
+			printf("Syntax error in schema file, found unexpected newline character.\n");
+			return -1;
+		default:
+			break;
+		}
+		if(cursor == '~' || cursor == '\t')
+		{
+			while(cursor != '\n')
+			{
+				cursor = fgetc(schemafile);
+			}
+			cursor = fgetc(schemafile);
+			continue;
+		}
+		else if(cursor == '#')
+		{
+			cursor = fgetc(schemafile);
+			for(unsigned register int i=0; i<31;i++)
+			{
+				if(tablename[i] == '\0')
+				{
+					if(cursor == '\n')
+					{
+						seek_tablename = 'y';
+					}
+					break;
+				}
+				else
+				{
+					if(tablename[i] == cursor)
+					{
+						cursor = fgetc(schemafile);
+						continue;
+					}
+					else
+					{
+						while(cursor != '\n')
+						{
+							cursor = fgetc(schemafile);
+						}
+						cursor = fgetc(schemafile);
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			printf("Syntax error in schema file, found line that does not start with ~, #, or \\t.\n");
+			return -1;
+		}
+	}
+
+	char colname_buffer[31];
+	char tablename_buffer[31];
+	char falloff = 'y';
+
+	while(cursor != EOF)
+	{
+		cursor = fgetc(schemafile);
+		if(cursor == '\t')
+		{
+			for(unsigned register int i=0;i<30;i++)
+			{
+				cursor = fgetc(schemafile);
+				if(cursor == '@')
+				{
+					colname_buffer[i] = '\0';
+					falloff = 'n';
+					break;
+				}
+				else if(cursor == '&')
+				{
+					return 1;
+				}
+				else if(cursor != '\n' && cursor != '\t' && cursor != '#' && cursor != EOF)
+				{
+					colname_buffer[i] = cursor;
+				}
+				else
+				{
+					printf("Line found under table %s without @.\n",tablename);
+					return -1;
+				}
+			}
+			if(falloff == 'y')
+			{
+				cursor = fgetc(schemafile);
+				if(cursor != '@')
+				{
+					printf("Columname too long or missing @ under table %s.\n",tablename);
+					return -1;
+				}
+			}
+			for(unsigned int i=0;i<30;i++)
+			{
+				cursor = fgetc(schemafile);
+				if(cursor == '\n')
+				{
+					tablename_buffer[i] = '\0';
+					break;
+				}
+				else
+				{
+					tablename_buffer[i] = cursor;
+				}
+			}
+			for(unsigned register int i=0;i<1000;i++)
+			{
+				if(columnames[i].name[0] == '\0')
+				{
+					printf("Column %s not found in table %s.\n",colname_buffer,tablename);
+					return -1;
+				}
+				if(strncmp(colname_buffer,columnames[i].name,31) == 0)
+				{
+					memcpy(columnames[i].FK,tablename_buffer,31);
+					colname_buffer[0] = '\0';
+					tablename_buffer[0] = '\0';
+					break;
+				}
+			}
+			if(colname_buffer[0] != '\0')
+			{
+				printf("column %s not found in table %s.\n",colname_buffer,tablename);
+				return -1;
+			}
+		}
+		else if(cursor == '~')
+		{
+			while(cursor != '\n')
+			{
+				cursor = fgetc(schemafile);
+			}
+		}
+		else if(cursor == '#' || cursor == EOF)
+		{
+			break;
+		}
+		else
+		{
+			printf("Syntax error in schema file under table %s.\n",tablename);
+			return -1;
+		}
+	}
+	return 0;
+}
+
+void outputHeader_leaf(FILE *outputfile, char *tablename, int colnum, colname_t *columnames)
 {
 	fprintf(outputfile,"<?xml version=\"1.0\"?>\n<!DOCTYPE rdf:RDF [<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\">]>\n<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://www.jnj.com/dwh/tables#\"\n  xmlns:dwh=\"http://www.jnj.com/dwh#\">\n\n\n<rdfs:Class rdf:ID=\"");
 
@@ -65,7 +228,7 @@ void outputHeader(FILE *outputfile, char *tablename, int colnum, char *columname
 
 	for(unsigned register int i=1;i<colnum;i++)
 	{
-		fprintf(outputfile,"<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n",tablename,columnames+i*31,tablename);
+		fprintf(outputfile,"<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n",tablename,columnames[i].name,tablename);
 	}
 
 	return;
@@ -76,7 +239,7 @@ void outputFooter(FILE *outputfile)
 	fprintf(outputfile,"</rdf:RDF>");
 }
 
-int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum, char *columnames)
+int outputTriples_leaf(FILE *outputfile, FILE *inputfile, char *tablename, int colnum, colname_t *columnames)
 {
 	int colmax = colnum-1;
 	char cursor;
@@ -108,7 +271,7 @@ int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum
 		fprintf(outputfile,"\">\n");
 		for(unsigned register int i=1;i<colnum;i++)
 		{
-			current_colname = columnames+(i*31);
+			current_colname = columnames[i].name;
 			fprintf(outputfile,"  <dwh:%s_%s>",tablename,current_colname);
 			do
 			{
@@ -158,7 +321,7 @@ int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum
 		return 1;
 }
 
-void outputHeader_anon(FILE *outputfile, char *tablename, int colnum, char *columnames)
+void outputHeader_leaf_anon(FILE *outputfile, char *tablename, int colnum, colname_t *columnames)
 {
 	fprintf(outputfile,"<?xml version=\"1.0\"?>\n<!DOCTYPE rdf:RDF [<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\">]>\n<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://www.jnj.com/dwh/tables#\"\n  xmlns:dwh=\"http://www.jnj.com/dwh#\">\n\n\n<rdfs:Class rdf:ID=\"");
 
@@ -167,13 +330,13 @@ void outputHeader_anon(FILE *outputfile, char *tablename, int colnum, char *colu
 
 	for(unsigned register int i=0;i<colnum;i++)
 	{
-		fprintf(outputfile,"<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n",tablename,columnames+i*31,tablename);
+		fprintf(outputfile,"<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n",tablename,columnames[i].name,tablename);
 	}
 
 	return;
 }
 
-int outputTriples_anon(FILE *outputfile, FILE *inputfile, char *tablename, int colnum, char *columnames)
+int outputTriples_leaf_anon(FILE *outputfile, FILE *inputfile, char *tablename, int colnum, colname_t *columnames)
 {
 	int colmax = colnum-1;
 	char cursor;
@@ -183,7 +346,7 @@ int outputTriples_anon(FILE *outputfile, FILE *inputfile, char *tablename, int c
 		fprintf(outputfile,"<dwh:%s>\n",tablename);
 		for(unsigned register int i=0;i<colnum;i++)
 		{
-			current_colname = columnames+(i*31);
+			current_colname = columnames[i].name;
 			fprintf(outputfile,"  <dwh:%s_%s>",tablename,current_colname);
 			do
 			{
@@ -209,6 +372,260 @@ int outputTriples_anon(FILE *outputfile, FILE *inputfile, char *tablename, int c
 					fprintf(outputfile,"%c",cursor);
 				}
 			} while(cursor != EOF);
+			fprintf(outputfile,"</dwh:%s_%s>\n",tablename,current_colname);
+		}
+		fprintf(outputfile,"</dwh:%s>\n\n",tablename);
+		cursor = fgetc(inputfile);
+		if(cursor == EOF)
+		{
+			break;
+		}
+		else
+		{
+			ungetc(cursor,inputfile);
+		}
+	} while(cursor != EOF);
+	return 0;
+
+	malformedFile:
+		printf("File is malformed, check output file.\n");
+		fclose(inputfile);
+		fclose(outputfile);
+		free(tablename);
+		free(columnames);
+		return 1;
+}
+
+void outputHeader(FILE *outputfile, char *tablename, int colnum, colname_t *columnames)
+{
+	fprintf(outputfile,"<?xml version=\"1.0\"?>\n<!DOCTYPE rdf:RDF [<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\">]>\n<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://www.jnj.com/dwh/tables#\"\n  xmlns:dwh=\"http://www.jnj.com/dwh#\">\n\n\n<rdfs:Class rdf:ID=\"");
+
+	fprintf(outputfile,"%s",tablename);
+	fprintf(outputfile,"\"/>\n\n");
+
+	for(unsigned register int i=1;i<colnum;i++)
+	{
+		if(columnames[i].FK[0] == '\0')
+		{
+			fprintf(outputfile,"<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n",tablename,columnames[i].name,tablename);
+		}
+		else
+		{
+			fprintf(outputfile,"<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n",tablename,columnames[i].name,tablename,columnames[i].FK);
+		}
+	}
+
+	return;
+}
+
+void outputHeader_anon(FILE *outputfile, char *tablename, int colnum, colname_t *columnames)
+{
+	fprintf(outputfile,"<?xml version=\"1.0\"?>\n<!DOCTYPE rdf:RDF [<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\">]>\n<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://www.jnj.com/dwh/tables#\"\n  xmlns:dwh=\"http://www.jnj.com/dwh#\">\n\n\n<rdfs:Class rdf:ID=\"");
+
+	fprintf(outputfile,"%s",tablename);
+	fprintf(outputfile,"\"/>\n\n");
+
+	for(unsigned register int i=0;i<colnum;i++)
+	{
+		if(columnames[i].FK[0] == '\0')
+		{
+			fprintf(outputfile,"<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n",tablename,columnames[i].name,tablename);
+		}
+		else
+		{
+			fprintf(outputfile,"<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n",tablename,columnames[i].name,tablename,columnames[i].FK);
+		}
+	}
+
+	return;
+}
+
+int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum, colname_t *columnames)
+{
+	int colmax = colnum-1;
+	char cursor;
+	char *current_colname = NULL;
+	char *current_FK = NULL;
+	do
+	{
+		fprintf(outputfile,"<dwh:%s rdf:ID=\"%s",tablename,tablename);
+		do
+		{
+			cursor = fgetc(inputfile);
+			switch(cursor)
+			{
+			case '\n':
+			case EOF:
+				goto malformedFile;
+				break;
+			default:
+				break;
+			}
+			if(cursor == ',')
+			{
+				break;
+			}
+			else
+			{
+				fprintf(outputfile,"%c",cursor);
+			}
+		} while(cursor != EOF);
+		fprintf(outputfile,"\">\n");
+		for(unsigned register int i=1;i<colnum;i++)
+		{
+			current_colname = columnames[i].name;
+			current_FK = columnames[i].FK;
+			fprintf(outputfile,"  <dwh:%s_%s>",tablename,current_colname);
+			if(current_FK[0] == '\0')
+			{
+				do
+				{
+					cursor = fgetc(inputfile);
+					switch(cursor)
+					{
+					case '\n':
+					case EOF:
+						if(i != (colnum-1))
+						{
+							goto malformedFile;
+						}
+						break;
+					default:
+						break;
+					}
+					if(cursor == ',' || cursor == '\n')
+					{
+						break;
+					}
+					else
+					{
+						fprintf(outputfile,"%c",cursor);
+					}
+				} while(cursor != EOF);
+			}
+			else
+			{
+				fprintf(outputfile,"<dwh:%s rdf:ID=\"%s",current_FK,current_FK);
+				do
+				{
+					cursor = fgetc(inputfile);
+					switch(cursor)
+					{
+					case '\n':
+					case EOF:
+						if(i != (colnum-1))
+						{
+							goto malformedFile;
+						}
+						break;
+					default:
+						break;
+					}
+					if(cursor == ',' || cursor == '\n')
+					{
+						break;
+					}
+					else
+					{
+						fprintf(outputfile,"%c",cursor);
+					}
+				} while(cursor != EOF);
+				fprintf(outputfile,"\"/>");
+			}
+			fprintf(outputfile,"</dwh:%s_%s>\n",tablename,current_colname);
+		}
+		fprintf(outputfile,"</dwh:%s>\n\n",tablename);
+		cursor = fgetc(inputfile);
+		if(cursor == EOF)
+		{
+			break;
+		}
+		else
+		{
+			ungetc(cursor,inputfile);
+		}
+	} while(cursor != EOF);
+	return 0;
+
+	malformedFile:
+		printf("File is malformed, check output file.\n");
+		fclose(inputfile);
+		fclose(outputfile);
+		free(tablename);
+		free(columnames);
+		return 1;
+}
+
+int outputTriples_anon(FILE *outputfile, FILE *inputfile, char *tablename, int colnum, colname_t *columnames)
+{
+	int colmax = colnum-1;
+	char cursor;
+	char *current_colname = NULL;
+	char *current_FK = NULL;
+	do
+	{
+		fprintf(outputfile,"<dwh:%s>\n",tablename);
+		for(unsigned register int i=0;i<colnum;i++)
+		{
+			current_colname = columnames[i].name;
+			current_FK = columnames[i].FK;
+			fprintf(outputfile,"  <dwh:%s_%s>",tablename,current_colname);
+			if(current_FK[0] == '\0')
+			{
+				do
+				{
+					cursor = fgetc(inputfile);
+					switch(cursor)
+					{
+					case '\n':
+					case EOF:
+						if(i != (colnum-1))
+						{
+							goto malformedFile;
+						}
+						break;
+					default:
+						break;
+					}
+					if(cursor == ',' || cursor == '\n')
+					{
+						break;
+					}
+					else
+					{
+						fprintf(outputfile,"%c",cursor);
+					}
+				} while(cursor != EOF);
+			}
+			else
+			{
+				fprintf(outputfile,"<dwh:%s rdf:ID=\"%s",current_FK,current_FK);
+				do
+				{
+					cursor = fgetc(inputfile);
+					switch(cursor)
+					{
+					case '\n':
+					case EOF:
+						if(i != (colnum-1))
+						{
+							goto malformedFile;
+						}
+						break;
+					default:
+						break;
+					}
+					if(cursor == ',' || cursor == '\n')
+					{
+						break;
+					}
+					else
+					{
+						fprintf(outputfile,"%c",cursor);
+					}
+				} while(cursor != EOF);
+				fprintf(outputfile,"\"/>");
+			}
 			fprintf(outputfile,"</dwh:%s_%s>\n",tablename,current_colname);
 		}
 		fprintf(outputfile,"</dwh:%s>\n\n",tablename);
