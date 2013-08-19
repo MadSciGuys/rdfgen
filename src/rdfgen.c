@@ -475,9 +475,9 @@ int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum
 		{
 			current_colname = columnames[i].name;
 			current_FK = columnames[i].FK;
-			fprintf(outputfile,"  <dwh:%s_%s>",tablename,current_colname);
 			if(current_FK[0] == '\0')
 			{
+				fprintf(outputfile,"  <dwh:%s_%s>",tablename,current_colname);
 				do
 				{
 					cursor = fgetc(inputfile);
@@ -502,10 +502,11 @@ int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum
 						fprintf(outputfile,"%c",cursor);
 					}
 				} while(cursor != EOF);
+			fprintf(outputfile,"</dwh:%s_%s>\n",tablename,current_colname);
 			}
 			else
 			{
-				fprintf(outputfile,"<dwh:%s rdf:ID=\"%s",current_FK,current_FK);
+				fprintf(outputfile,"  <dwh:%s_%s rdf:resource=\"dwh:%s",tablename,current_colname,current_FK);
 				do
 				{
 					cursor = fgetc(inputfile);
@@ -530,9 +531,8 @@ int outputTriples(FILE *outputfile, FILE *inputfile, char *tablename, int colnum
 						fprintf(outputfile,"%c",cursor);
 					}
 				} while(cursor != EOF);
-				fprintf(outputfile,"\"/>");
+				fprintf(outputfile,"\"/>\n");
 			}
-			fprintf(outputfile,"</dwh:%s_%s>\n",tablename,current_colname);
 		}
 		fprintf(outputfile,"</dwh:%s>\n\n",tablename);
 		cursor = fgetc(inputfile);
