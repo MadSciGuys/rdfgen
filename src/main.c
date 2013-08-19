@@ -13,19 +13,19 @@ int main(int argc,char *argv[])
 	FILE *outputfile;
 	FILE *schemafile;
 
-	char *inputfilename = malloc(256);
+	char *inputfilename = malloc(MAXFILENAME);
 	if(inputfilename == NULL)
 	{
 		printf("Couldn't allocate memory for *inputfilename.\nFATAL ERROR\n");
 		return 0;
 	}
-	char *outputfilename = malloc(35);
+	char *outputfilename = malloc(MAXTABLENAME+RDFEXTLEN);
 	if(outputfilename == NULL)
 	{
 		printf("Couldn't allocate memory for *outputfilename.\nFATAL ERROR\n");
 		return 0;
 	}
-	char *tablename = malloc(31);
+	char *tablename = malloc(MAXTABLENAME+1);
 	if(tablename == NULL)
 	{
 		printf("Couldn't allocate memory for *tablename.\nFATAL ERROR\n");
@@ -43,8 +43,8 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 
-	strncpy(inputfilename,argv[2],255);
-	*(inputfilename+255) = '\0';
+	strncpy(inputfilename,argv[2],MAXFILENAME-1);
+	*(inputfilename+(MAXFILENAME-1)) = '\0';
 	outputFilename(inputfilename,outputfilename,tablename);
 
 	inputfile = fopen(inputfilename,"r");
@@ -68,7 +68,7 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 
-	colname_t *columnames = malloc(1000*sizeof(colname_t));
+	colname_t *columnames = malloc(MAXCOLS*sizeof(colname_t));
 	if(columnames == NULL)
 	{
 		printf("Couldn't allocate memory for *columnames.\nFATAL ERROR\n");

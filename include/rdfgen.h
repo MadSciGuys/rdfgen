@@ -4,10 +4,18 @@
 #ifndef RDFGEN_H
 #define RDFGEN_H
 
+#define MAXFILENAME 256
+#define MAXTABLENAME 30
+
+#define RDFEXT ".rdf"
+#define RDFEXTLEN 5
+
+#define MAXCOLS 1000
+
 typedef struct
 {
-	char name[31];
-	char FK[31];
+	char name[MAXTABLENAME+1];
+	char FK[MAXTABLENAME+1];
 } colname_t;
 
 void outputFilename(char *inputfilename, char *outputfilename, char *tablename);

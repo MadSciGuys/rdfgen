@@ -2,7 +2,7 @@
 # twhitak@its.jnj.com
 
 CC = clang
-CFLAGS =
+CFLAGS = -O2
 INCLUDE = -I./include
 EXECUTABLE = rdfgen
 

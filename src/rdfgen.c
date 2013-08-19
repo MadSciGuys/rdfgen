@@ -9,7 +9,7 @@
 
 void outputFilename(char *inputfilename, char *outputfilename, char *tablename)
 {
-	for(unsigned register int i=0; i<30; i++)
+	for(unsigned register int i=0; i<MAXTABLENAME; i++)
 	{
 		if(*(inputfilename+i) == '.' || *(inputfilename+i) == '\0')
 		{
@@ -18,17 +18,17 @@ void outputFilename(char *inputfilename, char *outputfilename, char *tablename)
 		}
 		*(tablename+i) = *(inputfilename+i);
 	}
-	*(tablename+30) = '\0';
-	for(unsigned register int i=0;i<31;i++)
+	*(tablename+MAXTABLENAME) = '\0';
+	for(unsigned register int i=0;i<MAXTABLENAME+1;i++)
 	{
 		if(*(tablename+i) == '\0')
 		{
-			strcpy(outputfilename+i,".rdf");
+			strcpy(outputfilename+i,RDFEXT);
 			break;
 		}
 		*(outputfilename+i) = *(tablename+i);
 	}
-	*(outputfilename+34) = '\0';
+	*(outputfilename+MAXTABLENAME+RDFEXTLEN-1) = '\0';
 	return;
 }
 
@@ -39,8 +39,8 @@ int getColNames(FILE *inputfile, colname_t *columnames)
 	colname_t *colname = columnames;
 	int j = 0;
 	char EOL = 0x00;
-	int len=30;
-	for(unsigned register int i=0;i<30999;i++)
+	int len=MAXTABLENAME;
+	for(unsigned register int i=0;i<((MAXTABLENAME+1)*MAXCOLS);i++)
 	{
 		cursor = fgetc(inputfile);
 		if(cursor == '\n' || cursor == EOF)
@@ -51,7 +51,7 @@ int getColNames(FILE *inputfile, colname_t *columnames)
 		else if(cursor == ',')
 		{
 			j = 0;
-			len = 31;
+			len = MAXTABLENAME+1;
 			colname++;
 			colnum++;
 		}
@@ -113,7 +113,7 @@ int resolveFK(FILE *schemafile, char *tablename, colname_t *columnames)
 		else if(cursor == '#')
 		{
 			cursor = fgetc(schemafile);
-			for(unsigned register int i=0; i<31;i++)
+			for(unsigned register int i=0; i<(MAXTABLENAME+1);i++)
 			{
 				if(tablename[i] == '\0')
 				{
@@ -149,8 +149,8 @@ int resolveFK(FILE *schemafile, char *tablename, colname_t *columnames)
 		}
 	}
 
-	char colname_buffer[31];
-	char tablename_buffer[31];
+	char colname_buffer[MAXTABLENAME+1];
+	char tablename_buffer[MAXTABLENAME+1];
 	char falloff = 'y';
 
 	while(cursor != EOF)
@@ -190,7 +190,7 @@ int resolveFK(FILE *schemafile, char *tablename, colname_t *columnames)
 					return -1;
 				}
 			}
-			for(unsigned int i=0;i<30;i++)
+			for(unsigned int i=0;i<MAXTABLENAME;i++)
 			{
 				cursor = fgetc(schemafile);
 				if(cursor == '\n')
@@ -203,16 +203,16 @@ int resolveFK(FILE *schemafile, char *tablename, colname_t *columnames)
 					tablename_buffer[i] = cursor;
 				}
 			}
-			for(unsigned register int i=0;i<1000;i++)
+			for(unsigned register int i=0;i<MAXCOLS;i++)
 			{
 				if(columnames[i].name[0] == '\0')
 				{
 					printf("Column %s not found in table %s.\n",colname_buffer,tablename);
 					return -1;
 				}
-				if(strncmp(colname_buffer,columnames[i].name,31) == 0)
+				if(strncmp(colname_buffer,columnames[i].name,(MAXCOLS+1)) == 0)
 				{
-					memcpy(columnames[i].FK,tablename_buffer,31);
+					memcpy(columnames[i].FK,tablename_buffer,(MAXTABLENAME+1));
 					colname_buffer[0] = '\0';
 					tablename_buffer[0] = '\0';
 					break;
