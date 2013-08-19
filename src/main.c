@@ -6,7 +6,6 @@
 #include <stdlib.h>
 
 #include <rdfgen.h>
-#include <fileIO.h>
 
 int main(int argc,char *argv[])
 {

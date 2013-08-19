@@ -10,10 +10,9 @@ typedef struct
 	char FK[31];
 } colname_t;
 
-
+void outputFilename(char *inputfilename, char *outputfilename, char *tablename);
 int getColNames(FILE *inputfile, colname_t *columnames);
 int resolveFK(FILE *schmafile, char *tablename, colname_t *columnames);
-
 void outputHeader_leaf(FILE *outputfile, char *tablename, int colnum, colname_t *columnames);
 void outputFooter(FILE *outputfile);
 int outputTriples_leaf(FILE *outputfile, FILE *inputfile, char *tablename, int colnum, colname_t *columnames);
