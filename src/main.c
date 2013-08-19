@@ -32,14 +32,9 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 
-	if(argv[1] == NULL)
+	if(argv[1] == NULL || argv[3] != NULL)
 	{
-		printf("Too few arguments.\nUsage: rdfgen schema_file_name csv_file_name\n");
-		return 0;
-	}
-	else if(argv[3] != NULL)
-	{
-		printf("Too many arguments.\nUsage: rdfgen schema_file_name csv_file_name\n");
+		printf("Argument error.\nUsage: rdfgen schema_file_name csv_file_name\n");
 		return 0;
 	}
 
