@@ -31,6 +31,7 @@ int main(int argc,char *argv[])
 		printf("Couldn't allocate memory for *tablename.\nFATAL ERROR\n");
 		return 0;
 	}
+	char anon = 'n';
 
 	if(argv[1] == NULL || argv[3] != NULL)
 	{
@@ -77,7 +78,7 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 
-	int isLeaf = resolveFK(schemafile,tablename,columnames);
+	int isLeaf = resolveFK(&anon,schemafile,tablename,columnames);
 	if(isLeaf == -1)
 	{
 		printf("FATAL ERROR\n");
@@ -85,7 +86,7 @@ int main(int argc,char *argv[])
 	}
 	else if(isLeaf == 1)
 	{
-		if(columnames->name[0] == 'I' && columnames->name[1] == 'D' && columnames->name[2] == '\0')
+		if(anon == 'n')
 		{
 			outputHeader_leaf(outputfile,tablename,colnum,columnames);
 			fprintf(outputfile,"\n\n");
@@ -108,7 +109,7 @@ int main(int argc,char *argv[])
 	}
 	else
 	{
-		if(columnames->name[0] == 'I' && columnames->name[1] == 'D' && columnames->name[2] == '\0')
+		if(anon == 'n')
 		{
 			outputHeader(outputfile,tablename,colnum,columnames);
 			fprintf(outputfile,"\n\n");

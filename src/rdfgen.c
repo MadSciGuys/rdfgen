@@ -84,7 +84,7 @@ int getColNames(FILE *inputfile, colname_t *columnames)
 	return colnum;
 }
 
-int resolveFK(FILE *schemafile, char *tablename, colname_t *columnames)
+int resolveFK(char *anon, FILE *schemafile, char *tablename, colname_t *columnames)
 {
 	char cursor = fgetc(schemafile);
 	char seek_tablename = 'n';
@@ -110,8 +110,12 @@ int resolveFK(FILE *schemafile, char *tablename, colname_t *columnames)
 			cursor = fgetc(schemafile);
 			continue;
 		}
-		else if(cursor == '#')
+		else if(cursor == '#' || cursor == '&')
 		{
+			if(cursor == '&')
+			{
+				*anon = 'y';
+			}
 			cursor = fgetc(schemafile);
 			for(unsigned register int i=0; i<(MAXTABLENAME+1);i++)
 			{
