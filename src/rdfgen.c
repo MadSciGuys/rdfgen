@@ -110,9 +110,9 @@ int resolveFK(char *anon, FILE *schemafile, char *tablename, colname_t *columnam
 			cursor = fgetc(schemafile);
 			continue;
 		}
-		else if(cursor == '#' || cursor == '&')
+		else if(cursor == '#' || cursor == '*')
 		{
-			if(cursor == '&')
+			if(cursor == '*')
 			{
 				*anon = 'y';
 			}
