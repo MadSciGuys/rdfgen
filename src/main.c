@@ -72,8 +72,8 @@ int main(int argc,char *argv[])
 	}
 	// Got this far, get ready for the main loop.
 	// Allocate memory for the table metadata:
-	table_t *table = malloc(sizeof(table_t))
-	if(table_t == NULL)
+	table_t *table = malloc(sizeof(table_t));
+	if(table == NULL)
 	{
 		printf("Memory I/O error!\nUnable to allocate memory for table metadata.\nFATAL ERROR\n");
 		return 1;
@@ -95,6 +95,8 @@ int main(int argc,char *argv[])
 			printf("FATAL ERROR\n");
 			return 1;
 		}
+		printf("Table name: %s\nOutput file name: %s\n",table->tableName,outputfilename);
+	}
 	
 	
 	return 0;

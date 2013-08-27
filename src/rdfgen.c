@@ -19,17 +19,32 @@ int getTableName(char *inputfilename, char *outputfilename, table_t *table)
 	{
 		if(*(inputfilename+i) == '.') // Beginning of extension.
 		{
-			table->tablename[i] = '\0'
+			table->tableName[i] = '\0';
 			break;
 		}
-		else
+		else // Otherwise copy the character.
 		{
-			table->tablename[i] = *(inputfilename+i);
+			table->tableName[i] = *(inputfilename+i);
 		}
 	}
 	// If the last char isn't null, then the table name was too long:
-	if(*(inputfilename+MAX_TABLE_NAME_LEN) != '\0')
+	if(table->tableName[MAX_TABLE_NAME_LEN] != '\0')
 	{
-		printf("File name error!\nThe table's name in file %s is too long.\n",inputfilename);
+		printf("File name error!\nThe table name in file %s is too long.\n",inputfilename);
 		return -1;
 	}
+	// Now make the output file name:
+	for(int i=0;i<MAX_TABLE_NAME_LEN+1;i++)
+	{
+		if(table->tableName[i] == '\0') // Now write the extension.
+		{
+			snprintf((outputfilename+i),RDF_EXT_LEN+1,RDF_EXT);
+			break;
+		}
+		else // Otherwise copy the character.
+		{
+			*(outputfilename+i) = table->tableName[i];
+		}
+	}
+	return 0;
+}
