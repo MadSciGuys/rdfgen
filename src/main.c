@@ -6,6 +6,7 @@
 #include <string.h>
 
 // Memory management, kernel features and types:
+#include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>

@@ -3,6 +3,8 @@
 
 // Standar I/O functions:
 #include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
 
 // rdfgen structures and functions:
 #include <rdfgen.h>
