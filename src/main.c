@@ -103,7 +103,7 @@ int main( int argc, char *argv[] )
 			return 1;
 		}
 		// Stat the file:
-		if( fstat( inputfile_fd,&inputfile_stat ) == -1 )
+		if( fstat( inputfile_fd, &inputfile_stat ) == -1 )
 		{
 			printf( "File I/O error!\nUnable to stat input file %s\nFATAL ERROR\n", argv[currentArg] );
 			return 1;
