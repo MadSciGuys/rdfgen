@@ -26,7 +26,7 @@ int main(int argc,char *argv[])
 	// First make sure there are at least two arguments, fail otherwise:
 	if(argc < 3)
 	{
-		printf("TOO FEW ARGUMENTS!\nUsage:\nrdfgen schemafile csvfile1 csvfile2 csvfile3 ...\n");
+		printf("Too few arguments!\nUsage:\nrdfgen schemafile csvfile1 csvfile2 csvfile3 ...\n");
 		return 1;
 	}
 
