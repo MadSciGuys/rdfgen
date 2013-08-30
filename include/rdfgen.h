@@ -4,13 +4,15 @@
 #ifndef RDFGEN_H
 #define RDFGEN_H
 
-// Here we define program-wide parameters that vary according to the environment
-// and application. We've chosen default parameters for processing CSV files
-// sourced from Oracle tables on a UNIX-like machine. Note that these are
-// compiler macros, NOT variables. They are simply found and replaced in the
-// source code text at compile time. These can be easily identified in the
-// source by their capitalization and use of underscores. All field lengths
-// are in bytes and disregarding the terminating null byte.
+/*
+ * Here we define program-wide parameters that vary according to the environment
+ * and application. We've chosen default parameters for processing CSV files
+ * sourced from Oracle tables on a UNIX-like machine. Note that these are
+ * compiler macros, NOT variables. They are simply found and replaced in the
+ * source code text at compile time. These can be easily identified in the
+ * source by their capitalization and use of underscores. All field lengths
+ * are in bytes and disregarding the terminating null byte.
+ */
 
 // Define parameters of the output extension:
 
@@ -71,11 +73,11 @@ typedef struct
 } table_t;
 
 // Function declarations:
-int getTableName( char* inputfilename, char* outputfilename, table_t* table );
-int checkEmpty( char* inputfile_map );
-int getColumnNames( char* inputfile_map, table_t* table );
-int getTableMetadata( char* schemafile_map, table_t* table );
-void outputHeader( FILE* outputfile, table_t* table );
+int getTableName(char *inputfilename, char *outputfilename, table_t *table);
+int checkEmpty(char *inputfile_map);
+int getColumnNames(char *inputfile_map, table_t *table);
+int getTableMetadata(char *schemafile_map, table_t *table);
+void outputHeader(FILE *outputfile, table_t *table);
 void outputTriples( FILE* outputfile, char* inputfile_map, table_t* table, char* row_buffer );
 
 #endif
