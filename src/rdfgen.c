@@ -122,3 +122,9 @@ getColumnNames(char *inputfile_map, table_t *table)
 	table->totalColumns = column;
 	return 0;
 }
+
+// This function gets the table metadata from the schema file. return 1 on
+// error:
+int getTableMetadata(char *schemafile_map, table_t *table)
+{
+}

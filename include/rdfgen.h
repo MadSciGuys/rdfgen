@@ -43,7 +43,7 @@
 // Define structure to hold one field's worth of data for buffering:
 typedef struct
 {
-	char data[ MAX_FIELD_LEN + 1 ]; // One field or cell's worth of data.
+	char data[MAX_FIELD_LEN + 1]; // One field or cell's worth of data.
 } field_t;
 
 // Define enum for column type:
@@ -58,17 +58,17 @@ typedef enum
 typedef struct
 {
 	column_type_t type; // Column type.
-	char columnName[ MAX_COLUMN_NAME_LEN + 1 ]; // Name of the column.
-	char FKtarget[ MAX_TABLE_NAME_LEN + 1 ]; // If the column is an FK, this contains the name of the target. Null otherwise.
+	char columnName[MAX_COLUMN_NAME_LEN + 1]; // Name of the column.
+	char FKtarget[MAX_TABLE_NAME_LEN + 1]; // If the column is an FK, this contains the name of the target. Null otherwise.
 	field_t defaultValue; // Default column value if applicable.
 } column_t;
 
 // Define structure to hold table-specific information:
 typedef struct
 {
-	char tableName[ MAX_TABLE_NAME_LEN + 1 ]; // Name of the table.
+	char tableName[MAX_TABLE_NAME_LEN + 1]; // Name of the table.
 	int totalColumns; // Total number of columns in the table.
-	column_t columns[ MAX_COLUMNS ]; // List of columns in the table.
+	column_t columns[MAX_COLUMNS]; // List of columns in the table.
 	int primaryIdentifier; // Index in columns[] of the table's primary identifier. If negative, table has no primary identifier.
 } table_t;
 
