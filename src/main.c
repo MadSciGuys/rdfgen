@@ -116,7 +116,12 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 		// Check to make sure the input file has data in it:
-		if(checkEmpty(inputfile_map) == 1)
+		if(checkEmpty(inputfile_map) == -1)
+		{
+			printf("FATAL ERROR\n");
+			return 1;
+		}
+		else if(checkEmpty(inputfile_map) == 1)
 		{
 			printf("Input file error!\nFile %s contains no data.\nContinuing...\n", argv[currentArg]);
 			// Clean up after this iteration:

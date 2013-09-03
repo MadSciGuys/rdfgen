@@ -50,3 +50,75 @@ int getTableName(char *inputfilename, char *outputfilename, table_t *table)
 	}
 	return 0;
 }
+
+// This function checks to make sure the input file isn't empty. Return 0 if
+// the file is not empty, return 1 if it is, return -1 on fatal error.
+int checkEmpty(char *inputfile_map)
+{
+	int cursor;
+	// First seek to the end of the first line:
+	for(cursor = 0; cursor < ((MAX_COLUMN_NAME_LEN + 1) * MAX_COLUMNS); cursor++)
+	{
+		if(*(inputfile_map + cursor) == '\n')
+		{
+			break;
+		}
+	}
+	// Make sure we didn't fall out of the loop:
+	if(*(inputfile_map + cursor) != '\n')
+	{
+		printf("Input file error!\nIn file %s: first line is too long!\n");
+		return -1;
+	}
+	cursor++;
+	if(*(inputfile_map + cursor) == '\0')
+	{
+		return 1;
+	}
+	return 0;
+}
+
+// This function gets the names of the columns from the first line of the input
+// file and populates the table metadata. Returns 1 on error, 0 on success.
+getColumnNames(char *inputfile_map, table_t *table)
+{
+	int cursor = 0;
+	int column;
+	for(column = 0; column < MAX_COLUMNS; column++)
+	{
+		if(*(inputfile_map + cursor) == ',')
+		{
+			if(table->columns[column].columnName[0] == '\0')
+			{
+				printf("Input file error!\nName of column %d in table %s is blank.\n",(column +1),table->tableName);
+				return 1;
+			}
+			cursor++;
+			continue;
+		}
+		else
+		{
+			for(int i = 0; i < MAX_COLUMN_NAME_LEN + 1; i++)
+			{
+				if(*(inputfile_map + cursor) == ',')
+				{
+					table->columns[column].columnName[i] = '\0';
+					break;
+				}
+				else
+				{
+					table->columns[column].columnName[i] = *(inputfile_map + cursor);
+				}
+				cursor++;
+			}
+			if(table->columns[column].columnName[MAX_COLUMN] != '\0')
+			{
+				printf("Input file error!\nName of column %d in table %s is too long.\n",(column + 1),table->tableName);
+				return 1;
+			}
+		}
+	}
+	column++;
+	table->totalColumns = column;
+	return 0;
+}
