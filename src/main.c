@@ -16,6 +16,7 @@
 // Kernel level disk IO:
 #include <fcntl.h>
 
+#include <rdfgen/limits.h>
 #include <rdfgen/interface.h>
 
 

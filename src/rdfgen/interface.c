@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <rdfgen/limits.h>
 #include <rdfgen/interface.h>
 
 
@@ -160,7 +161,7 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 			}
 			break;
 		case '?':
-			if(defaultValue(arg1,arg2,table) == 1)
+			if(defineDV(arg1,arg2,table) == 1)
 			{
 				return 1;
 			}
