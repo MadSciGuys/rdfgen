@@ -16,8 +16,7 @@
 // Kernel level disk IO:
 #include <fcntl.h>
 
-// rdfgen structures:
-#include <rdfgen.h>
+#include <rdfgen/interface.h>
 
 
 

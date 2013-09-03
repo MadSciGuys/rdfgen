@@ -6,8 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-// rdfgen structures and functions:
-#include <rdfgen.h>
+#include <rdfgen/interface.h>
 
 
 
@@ -103,6 +102,7 @@ getColumnNames(char *inputfile_map, table_t *table)
 				if(*(inputfile_map + cursor) == ',')
 				{
 					table->columns[column].columnName[i] = '\0';
+					table->columns[column].type = real;
 					break;
 				}
 				else
@@ -123,8 +123,72 @@ getColumnNames(char *inputfile_map, table_t *table)
 	return 0;
 }
 
-// This function gets the table metadata from the schema file. return 1 on
-// error:
+// This function gets the table metadata from the schema file. Return 1 on
+// error, relying on other functions to report the specific error:
 int getTableMetadata(char *schemafile_map, table_t *table)
 {
-}
+	int cursor; // Keep track of our place between function calls.
+	char operator; // Keep track of the operator for this line.
+	char arg1[MAX_COLUMN_NAME_LEN + 1]; // First argument is always a column name.
+	char arg2[MAX_FIELD_LEN + 1]; // Second argument may be a column name or default field value.
+
+	// First, seek to the correct spot in the file:
+	if(schemaSeek(schemafile_map,table->tableName,&cursor) == 1)
+	{
+		return 1;
+	}
+	// The primary identifier must come next:
+	if(schemaPI(schemafile_map,table,&cursor) == 1)
+	{
+		return 1;
+	}
+	// Process each following line in turn:
+	while(operator != '#')
+	{
+		// Fetch the next line:
+		if(schemaFetchLine(schemafile_map,&operator,arg1,arg2,&cursor) == 1)
+		{
+			return 1;
+		}
+		// Handle the operator:
+		switch(operator)
+		{
+		case '>':
+			if(renameColumn(arg1,arg2,table) == 1)
+			{
+				return 1;
+			}
+			break;
+		case '?':
+			if(defaultValue(arg1,arg2,table) == 1)
+			{
+				return 1;
+			}
+			break;
+		case '*':
+			if(requireColumn(arg1,table) == 1)
+			{
+				return 1;
+			}
+			break;
+		case '@':
+			if(defineFK(arg1,arg2,table) == 1)
+			{
+				return 1;
+			}
+			break;
+		case '&':
+			if(defineVC(arg1,arg2,table) == 1)
+			{
+				return 1;
+			}
+			break;
+		case '#':
+			break;
+		default:
+			printf("INTERNAL EXECUTION STATE ERROR!\nSomething really bad happened in the function getTableMetadata()!\nInvalid value of switch char operator at location 0x%x!\n",&operator);
+			return 1;
+			break;
+		}
+	}
+	return 0;

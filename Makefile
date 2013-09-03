@@ -7,10 +7,10 @@ INCLUDE = -I./include
 EXECUTABLE = rdfgen
 
 all: rdfgen.o
-	$(CC) $(CFLAGS) $(INCLUDE) -o $(EXECUTABLE) src/main.c rdfgen.o
+	$(CC) $(CFLAGS) $(INCLUDE) -o $(EXECUTABLE) src/main.c interface.o
 
-rdfgen.o:
-	$(CC) -c $(CFLAGS) $(INCLUDE) src/rdfgen.c
+interface.o:
+	$(CC) -c $(CFLAGS) $(INCLUDE) src/rdfgen/interface.c
 
 install:
 	cp $(EXECUTABLE) /usr/local/bin/
