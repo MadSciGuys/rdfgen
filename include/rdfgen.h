@@ -72,7 +72,7 @@ typedef struct
 	int primaryIdentifier; // Index in columns[] of the table's primary identifier. If negative, table has no primary identifier.
 } table_t;
 
-// Function declarations:
+// Function exposed in main():
 int getTableName(char *inputfilename, char *outputfilename, table_t *table);
 int checkEmpty(char *inputfile_map);
 int getColumnNames(char *inputfile_map, table_t *table);
