@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// Memory management, kernel features and types:
+// Memory management, kernel API and system types:
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -16,7 +16,7 @@
 // Kernel level disk IO:
 #include <fcntl.h>
 
-// rdfgen structures and functions:
+// rdfgen structures:
 #include <rdfgen.h>
 
 
