@@ -9,8 +9,11 @@ EXECUTABLE = rdfgen
 all: rdfgen.o
 	$(CC) $(CFLAGS) $(INCLUDE) -o $(EXECUTABLE) src/main.c interface.o
 
-interface.o:
+interface.o: parser.o
 	$(CC) -c $(CFLAGS) $(INCLUDE) src/rdfgen/interface.c
+
+parser.o:
+	$(CC) -c $(CFLAGS) $(INCLUDE) src/rdfgen/parser.c
 
 install:
 	cp $(EXECUTABLE) /usr/local/bin/

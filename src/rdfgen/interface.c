@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include <rdfgen/limits.h>
+#include <rdfgen/parser.h>
 #include <rdfgen/interface.h>
 
 
@@ -129,7 +130,7 @@ getColumnNames(char *inputfile_map, table_t *table)
 int getTableMetadata(char *schemafile_map, table_t *table)
 {
 	int cursor; // Keep track of our place between function calls.
-	char operator; // Keep track of the operator for this line.
+	char op; // Keep track of the operator for this line.
 	char arg1[MAX_COLUMN_NAME_LEN + 1]; // First argument is always a column name.
 	char arg2[MAX_FIELD_LEN + 1]; // Second argument may be a column name or default field value.
 
@@ -144,15 +145,15 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 		return 1;
 	}
 	// Process each following line in turn:
-	while(operator != '#')
+	while(op != '#')
 	{
 		// Fetch the next line:
-		if(schemaFetchLine(schemafile_map,&operator,arg1,arg2,&cursor) == 1)
+		if(schemaFetchLine(schemafile_map,&op,arg1,arg2,&cursor) == 1)
 		{
 			return 1;
 		}
-		// Handle the operator:
-		switch(operator)
+		// Handle the op:
+		switch(op)
 		{
 		case '>':
 			if(renameColumn(arg1,arg2,table) == 1)
@@ -187,9 +188,10 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 		case '#':
 			break;
 		default:
-			printf("INTERNAL EXECUTION STATE ERROR!\nSomething really bad happened in the function getTableMetadata()!\nInvalid value of switch char operator at location 0x%x!\n",&operator);
+			printf("INTERNAL EXECUTION STATE ERROR!\nSomething really bad happened in the function getTableMetadata()!\nInvalid value of switch char operator at location 0x%x!\n",&op);
 			return 1;
 			break;
 		}
 	}
 	return 0;
+}
