@@ -153,6 +153,10 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 	// Process each following line in turn:
 	while(op != '#')
 	{
+		// Clean up after the previous iteration:
+		memset(arg1,'\0',MAX_COLUMN_NAME_LEN + 1);
+		memset(arg2,'\0',MAX_FIELD_LEN + 1);
+		op = '\0';
 		// Fetch the next line:
 		if(schemaFetchLine(schemafile_map,&op,arg1,arg2,&cursor) == 1)
 		{

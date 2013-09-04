@@ -78,6 +78,8 @@ int main(int argc, char *argv[])
 		printf("Memory I/O error!\nUnable to allocate memory for table metadata.\nFATAL ERROR\n");
 		return 1;
 	}
+	// Zero out:
+	memset(table,'\0',sizeof(*table));
 	// Allocate memory for a row buffer:
 	field_t *row_buffer = malloc(MAX_COLUMNS * sizeof(*row_buffer));
 	if(row_buffer == NULL)
@@ -85,6 +87,8 @@ int main(int argc, char *argv[])
 		printf("Memory I/O error!\nUnable to allocate memory for row buffer.\nFATAL ERROR\n");
 		return 1;
 	}
+	// Zero out:
+	memset(row_buffer,'\0',sizeof(*row_buffer));
 	// Ready for the main loop. We're going to iterate over the remaining arguments:
 	for(int currentArg = 2; currentArg < argc; currentArg++)
 	{
@@ -179,26 +183,26 @@ int main(int argc, char *argv[])
 				printf("real");
 				break;
 			case req:
-				printf("required");
+				printf("req");
 				break;
 			case virt:
-				printf("virtual");
+				printf("virt");
 				break;
 			default:
 				printf("!!!!!");
 				break;
 			}
-			printf(")\t");
+			printf(")\t\t\t");
 			switch(table->columns[i].FKtarget[0])
 			{
 			case '\0':
 				printf("Independent");
 				break;
 			default:
-				printf("->%s",table->columns[i].FKtarget);
+				printf("----->%s",table->columns[i].FKtarget);
 				break;
 			}
-			printf("\t");
+			printf("\t\t\t");
 			switch(table->columns[i].defaultValue.data[0])
 			{
 			case '\0':

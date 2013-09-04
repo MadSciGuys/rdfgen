@@ -31,17 +31,14 @@ int schemaSeek(char *schemafile_map, char *tableName, int *cursor)
 				}
 				_cursor++;
 			}
+			_cursor++;
 		}
 		else if(*(schemafile_map + _cursor) == '#')
 		{
 			_cursor++;
 			for(int i = 0; i < MAX_TABLE_NAME_LEN + 1; i++)
 			{
-				if(*(schemafile_map + _cursor) == tableName[i])
-				{
-					_cursor++;
-				}
-				else if(*(schemafile_map + _cursor) == '\n' && tableName[i] == '\0')
+				if(tableName[i] == '\0' && *(schemafile_map + _cursor) == '\n')
 				{
 					_cursor++;
 					*cursor = _cursor;
@@ -52,6 +49,10 @@ int schemaSeek(char *schemafile_map, char *tableName, int *cursor)
 					}
 					return 0;
 				}
+				else if(*(schemafile_map + _cursor) == tableName[i])
+				{
+					_cursor++;
+				}
 				else
 				{
 					while(*(schemafile_map + _cursor) != '\n')
@@ -61,7 +62,10 @@ int schemaSeek(char *schemafile_map, char *tableName, int *cursor)
 							printf("Schema file error!\nUnexpected EOF at position 0x%x\n",_cursor);
 							break;
 						}
+						_cursor++;
 					}
+					_cursor++;
+					break;
 				}
 			}
 		}
@@ -89,6 +93,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 	if(*(schemafile_map + _cursor) != '!')
 	{
 		printf("Schema file error!\nNo Primary Identifier defined in schema file for table %s\n",table->tableName);
+		printf("Found [[[%c]]] instead...\n",*(schemafile_map + _cursor));
 		return 1;
 	}
 	_cursor++;
@@ -139,6 +144,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 		if(strncmp(PIname,table->columns[i].columnName,MAX_COLUMN_NAME_LEN + 1) == 0)
 		{
 			table->primaryIdentifier = i;
+			table->columns[table->primaryIdentifier].type = req;
 			break;
 		}
 	}
@@ -356,6 +362,11 @@ int defineDV(char *arg1, char *arg2, table_t *table)
 		printf("Column default value assignment error!\nColumn name %s not found in table %s\n",arg1,table->tableName);
 		return 1;
 	}
+	else if(colnum == table->primaryIdentifier)
+	{
+		printf("Column default value assignment error!\nColumn %s is the Primary Identifier and cannot have a default value.\n",arg1);
+		return 1;
+	}
 	else
 	{
 		memset(table->columns[colnum].defaultValue.data,'\0',MAX_FIELD_LEN + 1);
@@ -380,6 +391,11 @@ int requireColumn(char *arg1, table_t *table)
 	if(colnum == -1)
 	{
 		printf("Column requirement spec error!\nColumn name %s not found in table %s\n",arg1,table->tableName);
+		return 1;
+	}
+	else if(colnum == table->primaryIdentifier)
+	{
+		printf("Column requirement spec error!\nColumn %s is the Primary Identifier and has a static type.\n",arg1);
 		return 1;
 	}
 	else
@@ -424,9 +440,9 @@ int defineVC(char *arg1, char *arg2, table_t *table)
 		return 1;
 	}
 	table->totalColumns = (table->totalColumns + 1);
-	memset(&(table->columns[table->totalColumns]),'\0',sizeof(column_t));
-	table->columns[table->totalColumns].type = virt;
-	strncpy(table->columns[table->totalColumns].columnName,arg1,MAX_COLUMN_NAME_LEN + 1);
-	strncpy(table->columns[table->totalColumns].defaultValue.data,arg2,MAX_TABLE_NAME_LEN + 1);
+	memset(&(table->columns[table->totalColumns - 1]),'\0',sizeof(column_t));
+	table->columns[table->totalColumns - 1].type = virt;
+	strncpy(table->columns[table->totalColumns - 1].columnName,arg1,MAX_COLUMN_NAME_LEN + 1);
+	strncpy(table->columns[table->totalColumns - 1].defaultValue.data,arg2,MAX_TABLE_NAME_LEN + 1);
 	return 0;
 }
