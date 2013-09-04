@@ -337,3 +337,29 @@ int renameColumn(char *arg1, char *arg2, table_t *table)
 		return 0;
 	}
 }
+
+// This function defines a default value for a column. Return 1 on error,
+// return 0 otherwise.
+int defineDV(char *arg1, char *arg2, table_t *table)
+{
+	int colnum = -1;
+	for(int i = 0; i < MAX_COLUMNS; i++)
+	{
+		if(strncmp(arg1,table->columns[i].columnName,MAX_COLUMN_NAME_LEN + 1) == 0)
+		{
+			colnum = i;
+			break;
+		}
+	}
+	if(colnum == -1)
+	{
+		printf("Column rename error!\nColumn name %s not found in table %s\n",arg1,table->tableName);
+		return 1;
+	}
+	else
+	{
+		memset(table->columns[colnum].defaultValue,'\0',MAX_FIELD_LEN + 1);
+		strncpy(table->columns[colnum].defaultValue,arg2,MAX_FIELD_LEN + 1);
+		return 0;
+	}
+}
