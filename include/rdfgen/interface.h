@@ -40,7 +40,7 @@ int getTableName(char *inputfilename, char *outputfilename, table_t *table);
 int checkEmpty(char *inputfile_map);
 int getColumnNames(char *inputfile_map, table_t *table);
 int getTableMetadata(char *schemafile_map, table_t *table);
-//void outputHeader(FILE *outputfile, table_t *table);
-//void outputTriples( FILE* outputfile, char* inputfile_map, table_t* table, char* row_buffer );
+void outputHeader(FILE *outputfile, table_t *table);
+void outputTriples( FILE* outputfile, char* inputfile_map, table_t* table, char* row_buffer );
 
 #endif

@@ -89,7 +89,7 @@ int getColumnNames(char *inputfile_map, table_t *table)
 	{
 		if(*(inputfile_map + cursor) == ',')
 		{
-			printf("Input file error!\nName of column %d in table %s is blank.\n",(column +1),table->tableName);
+			printf("Input file error!\nName of column %d in table %s is blank.\n", (column +1), table->tableName);
 			return 1;
 		}
 		else
@@ -112,14 +112,14 @@ int getColumnNames(char *inputfile_map, table_t *table)
 			{
 				if(table->columns[column].columnName[0] == '\0')
 				{
-					printf("Input file error!\nName of column %d in table %s is blank.\n",(column +1),table->tableName);
+					printf("Input file error!\nName of column %d in table %s is blank.\n", (column +1), table->tableName);
 					return 1;
 				}
 				break;
 			}
 			if(table->columns[column].columnName[MAX_COLUMNS] != '\0')
 			{
-				printf("Input file error!\nName of column %d in table %s is too long.\n",(column + 1),table->tableName);
+				printf("Input file error!\nName of column %d in table %s is too long.\n", (column + 1), table->tableName);
 				return 1;
 			}
 			cursor++;
@@ -140,25 +140,25 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 	char arg2[MAX_FIELD_LEN + 1]; // Second argument may be a column name or default field value.
 
 	// First, seek to the correct spot in the file:
-	if(schemaSeek(schemafile_map,table->tableName,&cursor) == 1)
+	if(schemaSeek(schemafile_map, table->tableName, &cursor) == 1)
 	{
 		return 1;
 	}
 	// The primary identifier must come next:
-	if(schemaPI(schemafile_map,table,&cursor) == 1)
+	if(schemaPI(schemafile_map, table, &cursor) == 1)
 	{
-		printf("Parsing error under table %s\n",table->tableName);
+		printf("Parsing error under table %s\n", table->tableName);
 		return 1;
 	}
 	// Process each following line in turn:
 	while(op != '#')
 	{
 		// Clean up after the previous iteration:
-		memset(arg1,'\0',MAX_COLUMN_NAME_LEN + 1);
-		memset(arg2,'\0',MAX_FIELD_LEN + 1);
+		memset(arg1, '\0', MAX_COLUMN_NAME_LEN + 1);
+		memset(arg2, '\0', MAX_FIELD_LEN + 1);
 		op = '\0';
 		// Fetch the next line:
-		if(schemaFetchLine(schemafile_map,&op,arg1,arg2,&cursor) == 1)
+		if(schemaFetchLine(schemafile_map, &op, arg1, arg2, &cursor) == 1)
 		{
 			return 1;
 		}
@@ -166,31 +166,31 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 		switch(op)
 		{
 		case '>':
-			if(renameColumn(arg1,arg2,table) == 1)
+			if(renameColumn(arg1, arg2, table) == 1)
 			{
 				return 1;
 			}
 			break;
 		case '?':
-			if(defineDV(arg1,arg2,table) == 1)
+			if(defineDV(arg1, arg2, table) == 1)
 			{
 				return 1;
 			}
 			break;
 		case '*':
-			if(requireColumn(arg1,table) == 1)
+			if(requireColumn(arg1, table) == 1)
 			{
 				return 1;
 			}
 			break;
 		case '@':
-			if(defineFK(arg1,arg2,table) == 1)
+			if(defineFK(arg1, arg2, table) == 1)
 			{
 				return 1;
 			}
 			break;
 		case '&':
-			if(defineVC(arg1,arg2,table) == 1)
+			if(defineVC(arg1, arg2, table) == 1)
 			{
 				return 1;
 			}
@@ -198,7 +198,7 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 		case '#':
 			break;
 		default:
-			printf("INTERNAL EXECUTION STATE ERROR!\nSomething really bad happened in the function getTableMetadata()!\nInvalid value of switch char operator at location 0x%x!\n",(unsigned int)&op);
+			printf("INTERNAL EXECUTION STATE ERROR!\nSomething really bad happened in the function getTableMetadata()!\nInvalid value of switch char operator at location 0x%x!\n", (unsigned int)&op);
 			return 1;
 			break;
 		}

@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	// Zero out:
-	memset(table,'\0',sizeof(*table));
+	memset(table, '\0', sizeof(*table));
 	// Allocate memory for a row buffer:
 	field_t *row_buffer = malloc(MAX_COLUMNS * sizeof(*row_buffer));
 	if(row_buffer == NULL)
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	// Zero out:
-	memset(row_buffer,'\0',sizeof(*row_buffer));
+	memset(row_buffer, '\0', sizeof(*row_buffer));
 	// Ready for the main loop. We're going to iterate over the remaining arguments:
 	for(int currentArg = 2; currentArg < argc; currentArg++)
 	{
@@ -163,20 +163,20 @@ int main(int argc, char *argv[])
 			printf("File I/O error!\nUnable to open output file %s\nFATAL ERROR\n", argv[currentArg]);
 			return 1;
 		}
-		printf("Table name: %s\n",table->tableName);
-		printf("Number of columns: %d\n",table->totalColumns);
+		printf("Table name: %s\n", table->tableName);
+		printf("Number of columns: %d\n", table->totalColumns);
 		if(table->primaryIdentifier == -1)
 		{
 			printf("No Primary Identifier\n");
 		}
 		else
 		{
-			printf("Primary Identifier: %s\n",table->columns[table->primaryIdentifier].columnName);
+			printf("Primary Identifier: %s\n", table->columns[table->primaryIdentifier].columnName);
 		}
 		printf("Columns:\n");
 		for(int i = 0; i < table->totalColumns; i++)
 		{
-			printf("\t%d: %s(",i + 1,table->columns[i].columnName);
+			printf("\t%d: %s(", i + 1, table->columns[i].columnName);
 			switch(table->columns[i].type)
 			{
 			case real:
@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
 				printf("virt");
 				break;
 			default:
-				printf("!!!!!");
+				printf("!!!!");
 				break;
 			}
 			printf(")\t\t\t");
@@ -209,17 +209,15 @@ int main(int argc, char *argv[])
 				printf("No default value");
 				break;
 			default:
-				printf("default value: %s",table->columns[i].defaultValue.data);
+				printf("default value: %s", table->columns[i].defaultValue.data);
 				break;
 			}
 			printf("\n");
 		}
-		/*
 		// Output the RDF header:
 		outputHeader(outputfile, table);
 		// Output the RDF triples:
 		outputTriples(outputfile, inputfile_map, table, row_buffer);
-		*/
 		// Clean up after this iteration:
 		fclose(outputfile);
 		memset(outputfilename, '\0', MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1);
