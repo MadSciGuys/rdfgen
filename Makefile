@@ -7,7 +7,7 @@ INCLUDE = -I./include
 EXECUTABLE = rdfgen
 
 all: rdfgen.o
-	$(CC) $(CFLAGS) $(INCLUDE) -o $(EXECUTABLE) src/main.c interface.o
+	$(CC) $(CFLAGS) $(INCLUDE) -o $(EXECUTABLE) src/main.c interface.o parser.o
 
 interface.o: parser.o
 	$(CC) -c $(CFLAGS) $(INCLUDE) src/rdfgen/interface.c
