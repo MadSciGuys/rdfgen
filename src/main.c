@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
 		printf("Columns:\n");
 		for(int i = 0; i < table->totalColumns; i++)
 		{
-			printf("\t%d: %s(",i,table->columns[i].columnName);
+			printf("\t%d: %s(",i + 1,table->columns[i].columnName);
 			switch(table->columns[i].type)
 			{
 			case real:

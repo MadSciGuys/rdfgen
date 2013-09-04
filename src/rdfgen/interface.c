@@ -89,19 +89,14 @@ int getColumnNames(char *inputfile_map, table_t *table)
 	{
 		if(*(inputfile_map + cursor) == ',')
 		{
-			if(table->columns[column].columnName[0] == '\0')
-			{
-				printf("Input file error!\nName of column %d in table %s is blank.\n",(column +1),table->tableName);
-				return 1;
-			}
-			cursor++;
-			continue;
+			printf("Input file error!\nName of column %d in table %s is blank.\n",(column +1),table->tableName);
+			return 1;
 		}
 		else
 		{
 			for(int i = 0; i < MAX_COLUMN_NAME_LEN + 1; i++)
 			{
-				if(*(inputfile_map + cursor) == ',')
+				if(*(inputfile_map + cursor) == ',' || *(inputfile_map + cursor) == '\n')
 				{
 					table->columns[column].columnName[i] = '\0';
 					table->columns[column].type = real;
@@ -110,14 +105,24 @@ int getColumnNames(char *inputfile_map, table_t *table)
 				else
 				{
 					table->columns[column].columnName[i] = *(inputfile_map + cursor);
+					cursor++;
 				}
-				cursor++;
+			}
+			if(*(inputfile_map + cursor) == '\n')
+			{
+				if(table->columns[column].columnName[0] == '\0')
+				{
+					printf("Input file error!\nName of column %d in table %s is blank.\n",(column +1),table->tableName);
+					return 1;
+				}
+				break;
 			}
 			if(table->columns[column].columnName[MAX_COLUMNS] != '\0')
 			{
 				printf("Input file error!\nName of column %d in table %s is too long.\n",(column + 1),table->tableName);
 				return 1;
 			}
+			cursor++;
 		}
 	}
 	column++;
