@@ -413,3 +413,20 @@ int defineFK(char *arg1, char *arg2, table_t *table)
 		return 0;
 	}
 }
+
+// This function defines a new virtual column and it's default value. Return
+// 1 on error, return 0 on success.
+int defineVC(char *arg1, char *arg2, table_t *table)
+{
+	if((table->totalColumns + 1) > MAX_COLUMNS)
+	{
+		printf("Virtual column definition error!\nMAX_COLUMNS EXCEEDED!\n");
+		return 1;
+	}
+	table->totalColumns = (table->totalColumns + 1);
+	memset(table->columns[table->totalColumns],'\0',sizeof(column_t));
+	table->columns[table->totalColumns].type = virt;
+	strncpy(table->columns[table->totalColumns].columnName,arg1,MAX_COLUMN_NAME_LEN + 1);
+	strncpy(table->columns[table->totalColumns].defaultValue,arg2,MAX_TABLE_NAME_LEN + 1);
+	return 0;
+}
