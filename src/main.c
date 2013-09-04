@@ -159,10 +159,63 @@ int main(int argc, char *argv[])
 			printf("File I/O error!\nUnable to open output file %s\nFATAL ERROR\n", argv[currentArg]);
 			return 1;
 		}
+		printf("Table name: %s\n",table->tableName);
+		printf("Number of columns: %d\n",table->totalColumns);
+		if(table->primaryIdentifier == -1)
+		{
+			printf("No Primary Identifier\n");
+		}
+		else
+		{
+			printf("Primary Identifier: %s\n",table->columns[table->primaryIdentifier].columnName);
+		}
+		printf("Columns:\n");
+		for(int i = 0; i < table->totalColumns; i++)
+		{
+			printf("\t%d: %s(",i,table->columns[i].columnName);
+			switch(table->columns[i].type)
+			{
+			case real:
+				printf("real");
+				break;
+			case req:
+				printf("required");
+				break;
+			case virt:
+				printf("virtual");
+				break;
+			default:
+				printf("!!!!!");
+				break;
+			}
+			printf(")\t");
+			switch(table->columns[i].FKtarget[0])
+			{
+			case '\0':
+				printf("Independent");
+				break;
+			default:
+				printf("->%s",table->columns[i].FKtarget);
+				break;
+			}
+			printf("\t");
+			switch(table->columns[i].defaultValue.data[0])
+			{
+			case '\0':
+				printf("No default value");
+				break;
+			default:
+				printf("default value: %s",table->columns[i].defaultValue.data);
+				break;
+			}
+			printf("\n");
+		}
+		/*
 		// Output the RDF header:
 		outputHeader(outputfile, table);
 		// Output the RDF triples:
 		outputTriples(outputfile, inputfile_map, table, row_buffer);
+		*/
 		// Clean up after this iteration:
 		fclose(outputfile);
 		memset(outputfilename, '\0', MAX_TABLE_NAME + RDF_EXT_LEN + 1);

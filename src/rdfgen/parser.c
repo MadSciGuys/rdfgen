@@ -358,8 +358,8 @@ int defineDV(char *arg1, char *arg2, table_t *table)
 	}
 	else
 	{
-		memset(table->columns[colnum].defaultValue,'\0',MAX_FIELD_LEN + 1);
-		strncpy(table->columns[colnum].defaultValue,arg2,MAX_FIELD_LEN + 1);
+		memset(table->columns[colnum].defaultValue.data,'\0',MAX_FIELD_LEN + 1);
+		strncpy(table->columns[colnum].defaultValue.data,arg2,MAX_FIELD_LEN + 1);
 		return 0;
 	}
 }
@@ -427,6 +427,6 @@ int defineVC(char *arg1, char *arg2, table_t *table)
 	memset(table->columns[table->totalColumns],'\0',sizeof(column_t));
 	table->columns[table->totalColumns].type = virt;
 	strncpy(table->columns[table->totalColumns].columnName,arg1,MAX_COLUMN_NAME_LEN + 1);
-	strncpy(table->columns[table->totalColumns].defaultValue,arg2,MAX_TABLE_NAME_LEN + 1);
+	strncpy(table->columns[table->totalColumns].defaultValue.data,arg2,MAX_TABLE_NAME_LEN + 1);
 	return 0;
 }
