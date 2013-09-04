@@ -142,6 +142,7 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 	// The primary identifier must come next:
 	if(schemaPI(schemafile_map,table,&cursor) == 1)
 	{
+		printf("Parsing error under table %s\n",table->tableName);
 		return 1;
 	}
 	// Process each following line in turn:

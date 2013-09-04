@@ -102,6 +102,12 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 			return 1;
 		}
 		_cursor++;
+		if(*(schemafile_map + _cursor) == '\0')
+		{
+			*cursor = _cursor;
+			return 0;
+		}
+		_cursor++;
 		*cursor = _cursor;
 		return 0;
 	}
@@ -182,5 +188,127 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 	{
 	printf("Schema file error!\nUnexpected char at position 0x%x\n",_cursor);
 	return 1
+	}
+}
+
+// This function fetches the operator and arguments from one line of the schema
+// file. Cursor should be on the tab preceeding the declaration. Return 1 on
+// error, return 0 otherwise.
+int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, int *cursor)
+{
+	int _cursor = *cursor;
+	if(*(schemafile_map + _cursor) != '\t')
+	{
+		if(*(schemafile_map + _cursor) == '#' || *(schemafile_map + _cusor) == '\0')
+		{
+			*op = '#';
+			arg1[0] = '\0';
+			arg2[0] = '\0';
+			return 0
+		}
+		else
+		{
+			printf("Schema file error!\nMalformed line at position 0x%x\n",_cursor);
+			return 1;
+		}
+	}
+	_cursor++;
+	for(int i = 0; i < MAX_COLUMN_NAME_LEN; i++)
+	{
+		if(*(schemafile_map + _cursor) == '!')
+		{
+			printf("Schema file error!\nUnexpected '!' at position 0x%x\n",_cursor);
+			return 1;
+		}
+		else if(*(schemafile_map + _cursor) == '\n')
+		{
+			printf("Schema file error!\nUnexpected line feed at position 0x%x\n",_cursor);
+			return 1;
+		}
+		else if(*(schemafile_map + _cursor) == '>' || *(schemafile_map + _cursor) == '?' || *(schemafile_map + _cursor) == '*' || *(schemafile_map + _cursor) == '@' || *(schemafile_map + _cursor) == '&')
+		{
+			*op = *(schemafile_map + _cursor);
+			arg1[i] = '\0';
+			break;
+		}
+		else
+		{
+			arg1[i] = *(schemafile_map + _cursor);
+		}
+		_cursor++;
+	}
+	if(*op == '*')
+	{
+		arg2[0] = '\0';
+		if(arg1[MAX_COLUMN_NAME_LEN] == '\0')
+		{
+			if(*(schemafile_map + _cursor) == '\0')
+			{
+				*cursor = _cursor;
+				return 0;
+			}
+			_cursor = _cursor + 2;
+			*cursor = _cursor;
+			return 0;
+		}
+		else
+		{
+			printf("Schema file error!\nInitial argument too long.\n");
+			return 1;
+		}
+	}
+	_cursor++;
+	for(int i = 0; i < MAX_FIELD_LEN; i++)
+	{
+		if(*(schemafile_map + _cursor) == '\n' || *(schemafile_map + _cursor) == '\0')
+		{
+			arg2[i] = '\0';
+			break;
+		}
+		else if(*(schemafile_map + _cursor) == '!' || *(schemafile_map + _cursor) == '>' || *(schemafile_map + _cursor) == '?' || *(schemafile_map + _cursor) == '*' || *(schemafile_map + _cursor) == '@' || *(schemafile_map + _cursor) == '&')
+		{
+			printf("Schema file error!\nToo many arguments!\n");
+			return 1;
+		}
+		else
+		{
+			arg2[i] = *(schemafile_map + _cursor);
+		}
+		_cursor++;
+	}
+	if(*op == '>')
+	{
+		if(arg2[MAX_COLUMN_NAME_LEN] != '\0')
+		{
+			printf("Schema file error!\nNew name for column %s is too long.\n",arg1);
+			return 1;
+		}
+	}
+	else if(*op == '?' || *op == '&')
+	{
+		if(arg2[MAX_FIELD_LEN] != '\0')
+		{
+			printf("Schema file error!\nDefault value for column %s is too long.\n",arg1);
+			return 1;
+		}
+	}
+	else if(*op == '@')
+	{
+		if(arg2[MAX_TABLE_NAME_LEN] != '\0')
+		{
+			printf("Schema file error!\nForeign Key target name for column %s is too long.\n",arg1);
+			return 1;
+		}
+	}
+	if(*(schemafile_map + _cursor) == '\0')
+	{
+		*cursor = _cursor;
+		return 0;
+	}
+	else
+	{
+		_cursor++;
+		*cursor = _cursor;
+		return 0;
 	}
 }
