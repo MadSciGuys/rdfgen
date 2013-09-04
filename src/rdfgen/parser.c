@@ -333,7 +333,7 @@ int renameColumn(char *arg1, char *arg2, table_t *table)
 	else
 	{
 		memset(table->columns[colnum].columnName,'\0',MAX_COLUMN_NAME_LEN + 1);
-		strncpy(table->columns[colnum].columnName,arg1,MAX_COLUMN_NAME_LEN + 1);
+		strncpy(table->columns[colnum].columnName,arg2,MAX_COLUMN_NAME_LEN + 1);
 		return 0;
 	}
 }
@@ -385,6 +385,31 @@ int requireColumn(char *arg1, table_t *table)
 	else
 	{
 		table->columns[colnum].type = req;
+		return 0;
+	}
+}
+
+// This function sets a column's FK target. Return 1 on error, 0 otherwise.
+int defineFK(char *arg1, char *arg2, table_t *table)
+{
+	int colnum = -1;
+	for(int i = 0; i < table->totalColumsn; i++)
+	{
+		if(strncmp(arg1,table->columns[i].columnName,MAX_COLUMN_NAME_LEN + 1) == 0)
+		{
+			colnum = i;
+			break;
+		}
+	}
+	if(colnum == -1)
+	{
+		printf("Column FK target assignment error!\nColumn name %s not found in table %s\n",arg1,table->tableName);
+		return 1;
+	}
+	else
+	{
+		memset(table->columns[colnum].FKtarget,'\0',MAX_TABLE_NAME_LEN + 1);
+		strncpy(table->columns[colnum].FKtarget,arg2,MAX_TABLE_NAME_LEN + 1);
 		return 0;
 	}
 }
