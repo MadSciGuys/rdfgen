@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include <rdfgen/limits.h>
+#include <rdfgen/generator.h>
 #include <rdfgen/parser.h>
 #include <rdfgen/interface.h>
 
@@ -205,3 +206,30 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 	}
 	return 0;
 }
+
+// This function outputs the RDF header. If we've gotten this far, the only
+// possible errors will occur at the kernel level, or so we hope...
+void outputHeader(FILE *outputfile, table_t table)
+{
+	fprintf(outputfile, XML_VERSION);
+	fprintf(outputfile, "\n");
+	fprintf(outputfile, DOCTYPE);
+	fprintf(outputfile, "\n");
+	fprintf(outputfile, RDF_NAMESPACES);
+	fprintf(outputfile, "\n\n");
+
+	fprintf(outputfile, "<rdfs:Class rdf:ID=\"%s\"/>\n\n", table.tableName);
+
+	for(int i = 0; i < table.totalColumns; i++)
+	{
+		if(i == table.primaryIdentifier)
+		{
+			// If the PI is not an FK, it is a component of the node name and is therefore NOT a property.
+			if(table.columns[i].FKtarget[0] == '\0')
+			{
+				continue;
+			}
+			else
+			{
+				fprintf(outputfile, "  <rdfs:domain rdf:resource=\"#%s\"/>\n  <",table.columns[i].FKtarget);
+			}

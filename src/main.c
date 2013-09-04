@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
 			printf("\n");
 		}
 		// Output the RDF header:
-		outputHeader(outputfile, table);
+		outputHeader(outputfile, *table);
 		// Output the RDF triples:
 		outputTriples(outputfile, inputfile_map, table, row_buffer);
 		// Clean up after this iteration:
