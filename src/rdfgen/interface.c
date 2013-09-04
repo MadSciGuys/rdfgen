@@ -68,7 +68,7 @@ int checkEmpty(char *inputfile_map)
 	// Make sure we didn't fall out of the loop:
 	if(*(inputfile_map + cursor) != '\n')
 	{
-		printf("Input file error!\nIn file %s: first line is too long!\n");
+		printf("Input file error!\nFirst line is too long!\n");
 		return -1;
 	}
 	cursor++;
@@ -81,7 +81,7 @@ int checkEmpty(char *inputfile_map)
 
 // This function gets the names of the columns from the first line of the input
 // file and populates the table metadata. Returns 1 on error, 0 on success.
-getColumnNames(char *inputfile_map, table_t *table)
+int getColumnNames(char *inputfile_map, table_t *table)
 {
 	int cursor = 0;
 	int column;
@@ -113,7 +113,7 @@ getColumnNames(char *inputfile_map, table_t *table)
 				}
 				cursor++;
 			}
-			if(table->columns[column].columnName[MAX_COLUMN] != '\0')
+			if(table->columns[column].columnName[MAX_COLUMNS] != '\0')
 			{
 				printf("Input file error!\nName of column %d in table %s is too long.\n",(column + 1),table->tableName);
 				return 1;
@@ -189,7 +189,7 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 		case '#':
 			break;
 		default:
-			printf("INTERNAL EXECUTION STATE ERROR!\nSomething really bad happened in the function getTableMetadata()!\nInvalid value of switch char operator at location 0x%x!\n",&op);
+			printf("INTERNAL EXECUTION STATE ERROR!\nSomething really bad happened in the function getTableMetadata()!\nInvalid value of switch char operator at location 0x%x!\n",(unsigned int)&op);
 			return 1;
 			break;
 		}

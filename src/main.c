@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 		// Map the memory:
-		inputfile_map = mmap(NULL, inputfile_stat.sd_size, PROT_READ, MAP_PRIVATE, inputfile_fd, 0);
+		inputfile_map = mmap(NULL, inputfile_stat.st_size, PROT_READ, MAP_PRIVATE, inputfile_fd, 0);
 		if(inputfile_map == MAP_FAILED)
 		{
 			printf("Memory map error!\nUnable to create map for input file %s\nFATAL ERROR\n", argv[currentArg]);
@@ -218,9 +218,9 @@ int main(int argc, char *argv[])
 		*/
 		// Clean up after this iteration:
 		fclose(outputfile);
-		memset(outputfilename, '\0', MAX_TABLE_NAME + RDF_EXT_LEN + 1);
+		memset(outputfilename, '\0', MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1);
 		memset(table, '\0', sizeof(table));
-		if(munmap(inputfile_map, inputfile_stat.sh_size) == -1)
+		if(munmap(inputfile_map, inputfile_stat.st_size) == -1)
 		{
 			printf("Memory map error!\nUnable to unmap input file %s\nFATAL ERROR\n",argv[currentArg]);
 			return 1;

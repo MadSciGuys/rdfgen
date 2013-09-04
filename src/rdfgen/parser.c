@@ -67,7 +67,7 @@ int schemaSeek(char *schemafile_map, char *tableName, int *cursor)
 		}
 		else
 		{
-			printf("Schema file error!\nFound line that does not begin with ~, !, or tab\n",_cursor);
+			printf("Schema file error!\nFound line that does not begin with ~, !, or tab\n");
 			return 1;
 		}
 	}
@@ -113,7 +113,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 	}
 	for(int i = 0; i < MAX_COLUMN_NAME_LEN + 1; i++)
 	{
-		if(*(schemefile_map + _cursor) == '@' || *(schemafile_map + _cursor) == '\n')
+		if(*(schemafile_map + _cursor) == '@' || *(schemafile_map + _cursor) == '\n')
 		{
 			PIname[i] = '\0';
 			break;
@@ -136,7 +136,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 	}
 	for(int i = 0; i < MAX_COLUMNS; i++)
 	{
-		if(strncmp(PIname,table->columns[i],MAX_COLUMN_NAME_LEN + 1) == 0)
+		if(strncmp(PIname,table->columns[i].columnName,MAX_COLUMN_NAME_LEN + 1) == 0)
 		{
 			table->primaryIdentifier = i;
 			break;
@@ -144,7 +144,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 	}
 	if(table->primaryIdentifier == -2)
 	{
-		printf("Schema file error!\nTable %s: Primary Identifier %s not found in table file.\n"table->tableName,PIname);
+		printf("Schema file error!\nTable %s: Primary Identifier %s not found in table file.\n",table->tableName,PIname);
 		return 1;
 	}
 	if(*(schemafile_map + _cursor) == '\n')
@@ -187,7 +187,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 	else
 	{
 	printf("Schema file error!\nUnexpected char at position 0x%x\n",_cursor);
-	return 1
+	return 1;
 	}
 }
 
@@ -199,12 +199,12 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, int 
 	int _cursor = *cursor;
 	if(*(schemafile_map + _cursor) != '\t')
 	{
-		if(*(schemafile_map + _cursor) == '#' || *(schemafile_map + _cusor) == '\0')
+		if(*(schemafile_map + _cursor) == '#' || *(schemafile_map + _cursor) == '\0')
 		{
 			*op = '#';
 			arg1[0] = '\0';
 			arg2[0] = '\0';
-			return 0
+			return 0;
 		}
 		else
 		{
@@ -369,7 +369,7 @@ int defineDV(char *arg1, char *arg2, table_t *table)
 int requireColumn(char *arg1, table_t *table)
 {
 	int colnum = -1;
-	for(int i = 0; i < table->totalColumsn; i++)
+	for(int i = 0; i < table->totalColumns; i++)
 	{
 		if(strncmp(arg1,table->columns[i].columnName,MAX_COLUMN_NAME_LEN + 1) == 0)
 		{
@@ -393,7 +393,7 @@ int requireColumn(char *arg1, table_t *table)
 int defineFK(char *arg1, char *arg2, table_t *table)
 {
 	int colnum = -1;
-	for(int i = 0; i < table->totalColumsn; i++)
+	for(int i = 0; i < table->totalColumns; i++)
 	{
 		if(strncmp(arg1,table->columns[i].columnName,MAX_COLUMN_NAME_LEN + 1) == 0)
 		{
@@ -424,7 +424,7 @@ int defineVC(char *arg1, char *arg2, table_t *table)
 		return 1;
 	}
 	table->totalColumns = (table->totalColumns + 1);
-	memset(table->columns[table->totalColumns],'\0',sizeof(column_t));
+	memset(&(table->columns[table->totalColumns]),'\0',sizeof(column_t));
 	table->columns[table->totalColumns].type = virt;
 	strncpy(table->columns[table->totalColumns].columnName,arg1,MAX_COLUMN_NAME_LEN + 1);
 	strncpy(table->columns[table->totalColumns].defaultValue.data,arg2,MAX_TABLE_NAME_LEN + 1);
