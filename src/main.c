@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 	// The schema file's map persists across the processing of input files,
 	// so we'll handle it outside of the main loop.
 	// First ask the kernel to create the fd:
+	printf("About to open schema file...\n");
 	schemafile_fd = open(argv[1], O_READ_FLAGS);
 	// Make sure that worked:
 	if(schemafile_fd == -1)
@@ -215,9 +216,9 @@ int main(int argc, char *argv[])
 			printf("\n");
 		}
 		// Output the RDF header:
-		outputHeader(outputfile, *table);
+		outputHeader(outputfile, table);
 		// Output the RDF triples:
-		outputTriples(outputfile, inputfile_map, table, row_buffer);
+//		outputTriples(outputfile, inputfile_map, table, row_buffer);
 		// Clean up after this iteration:
 		fclose(outputfile);
 		memset(outputfilename, '\0', MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1);
