@@ -243,3 +243,47 @@ void outputHeader(FILE *outputfile, table_t *table)
 	fprintf(outputfile, "\n\n");
 	return;
 }
+
+// This function outputs the RDF triples. here should be no userspace errors...
+void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_t *row_buffer)
+{
+	int cursor;
+	bool leaf;
+	// Seek to the beginning of the first data line:
+	for(cursor = 0; cursor < ((MAX_COLUMN_NAME_LEN + 1) * MAX_COLUMNS); cursor++)
+	{
+		if(*(inputfile_map + cursor) == '\n')
+		{
+			cursor++;
+			break;
+		}
+	}
+	if(table->primaryIdentifier == -1)
+	{
+		if(checkLeaf(table) == 1)
+		{
+			genTriples_anon_leaf(inputfile_map, &cursor, outputfile, row_buffer, table);
+		}
+		else
+		{
+			genTriples_anon(inputfile_map, &cursor, outputfile, row_buffer, table);
+		}
+	}
+	else if(table->columns[table->primaryIdentifier].FKtarget != '\0')
+	{
+		genTriples_pifk(inputfile_map, &cursor, outputfile, row_buffer, table)
+	}
+	else
+	{
+		if(checkLeaf(table) == 1)
+		{
+			genTriples_leaf(inputfile_map, &cursor, outputfile, row_buffer, table);
+		}
+		else
+		{
+			genTriples(inputfile_map, &cursor, outputfile, row_buffer, table);
+		}
+	}
+	fprintf(outputfile, "\n\n</rdf:RDF>");
+	return;
+}

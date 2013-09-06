@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
 		// Output the RDF header:
 		outputHeader(outputfile, table);
 		// Output the RDF triples:
-//		outputTriples(outputfile, inputfile_map, table, row_buffer);
+		outputTriples(outputfile, inputfile_map, table, row_buffer);
 		// Clean up after this iteration:
 		fclose(outputfile);
 		memset(outputfilename, '\0', MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1);
