@@ -9,6 +9,7 @@
 #include <rdfgen/limits.h>
 #include <rdfgen/interface.h>
 #include <rdfgen/parser.h>
+#include <rdfgen/structure.h>
 
 
 
@@ -44,7 +45,7 @@ int schemaSeek(char *schemafile_map, char *tableName, int *cursor)
 					*cursor = _cursor;
 					if(*(schemafile_map + *cursor) != '\t')
 					{
-						printf("Schema file error!\nMalformed line at position 0x%x\n", *cursor);
+						printf("Schema file error!\nMalformed line at position 0x%x found by schemaSeek()\n", *cursor);
 						return 1;
 					}
 					return 0;
@@ -112,7 +113,6 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 			*cursor = _cursor;
 			return 0;
 		}
-		_cursor++;
 		*cursor = _cursor;
 		return 0;
 	}
@@ -214,7 +214,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, int 
 		}
 		else
 		{
-			printf("Schema file error!\nMalformed line at position 0x%x\n", _cursor);
+			printf("Schema file error!\nMalformed line at position 0x%x found by schemaFetchLine()\n", _cursor);
 			return 1;
 		}
 	}

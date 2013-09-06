@@ -7,9 +7,10 @@
 #include <string.h>
 
 #include <rdfgen/limits.h>
-#include <rdfgen/generator.h>
 #include <rdfgen/parser.h>
 #include <rdfgen/interface.h>
+#include <rdfgen/structure.h>
+#include <rdfgen/generator.h>
 
 
 
@@ -240,7 +241,6 @@ void outputHeader(FILE *outputfile, table_t *table)
 			fprintf(outputfile, "<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"%s\"/>\n</rdf:Property>\n\n", table->tableName, table->columns[i].columnName, table->tableName);
 		}
 	}
-	fprintf(outputfile, "\n\n");
 	return;
 }
 
@@ -262,28 +262,33 @@ void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_
 	{
 		if(checkLeaf(table) == 1)
 		{
+			printf("Using genTriples_anon_leaf()\n");
 			genTriples_anon_leaf(inputfile_map, &cursor, outputfile, row_buffer, table);
 		}
 		else
 		{
+			printf("Using genTriples_anon()\n");
 			genTriples_anon(inputfile_map, &cursor, outputfile, row_buffer, table);
 		}
 	}
-	else if(table->columns[table->primaryIdentifier].FKtarget != '\0')
+	else if(table->columns[table->primaryIdentifier].FKtarget[0] != '\0')
 	{
-		genTriples_pifk(inputfile_map, &cursor, outputfile, row_buffer, table)
+		printf("Using genTriples_pifk\n");
+		genTriples_pifk(inputfile_map, &cursor, outputfile, row_buffer, table);
 	}
 	else
 	{
 		if(checkLeaf(table) == 1)
 		{
+			printf("Using genTriples_leaf()\n");
 			genTriples_leaf(inputfile_map, &cursor, outputfile, row_buffer, table);
 		}
 		else
 		{
+			printf("Using genTriples()\n");
 			genTriples(inputfile_map, &cursor, outputfile, row_buffer, table);
 		}
 	}
-	fprintf(outputfile, "\n\n</rdf:RDF>");
+	fprintf(outputfile, "\n</rdf:RDF>");
 	return;
 }

@@ -6,14 +6,17 @@ CFLAGS = -O2
 INCLUDE = -I./include
 EXECUTABLE = rdfgen
 
-all: interface.o parser.o
-	$(CC) $(CFLAGS) $(INCLUDE) -o $(EXECUTABLE) src/main.c interface.o parser.o
+all: interface.o parser.o generator.o
+	$(CC) $(CFLAGS) $(INCLUDE) -o $(EXECUTABLE) src/main.c interface.o parser.o generator.o
 
 interface.o: parser.o
 	$(CC) -c $(CFLAGS) $(INCLUDE) src/rdfgen/interface.c
 
 parser.o:
 	$(CC) -c $(CFLAGS) $(INCLUDE) src/rdfgen/parser.c
+
+generator.o:
+	$(CC) -c $(CFLAGS) $(INCLUDE) src/rdfgen/generator.c
 
 install:
 	cp $(EXECUTABLE) /usr/local/bin/

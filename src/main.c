@@ -18,6 +18,7 @@
 
 #include <rdfgen/limits.h>
 #include <rdfgen/interface.h>
+#include <rdfgen/structure.h>
 
 
 
@@ -51,7 +52,6 @@ int main(int argc, char *argv[])
 	// The schema file's map persists across the processing of input files,
 	// so we'll handle it outside of the main loop.
 	// First ask the kernel to create the fd:
-	printf("About to open schema file...\n");
 	schemafile_fd = open(argv[1], O_READ_FLAGS);
 	// Make sure that worked:
 	if(schemafile_fd == -1)
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	// Zero out:
-	memset(row_buffer, '\0', sizeof(*row_buffer));
+	memset(row_buffer, '\0', sizeof(*row_buffer) * MAX_COLUMNS);
 	// Ready for the main loop. We're going to iterate over the remaining arguments:
 	for(int currentArg = 2; currentArg < argc; currentArg++)
 	{

@@ -9,6 +9,8 @@
 #include <rdfgen/limits.h>
 #include <rdfgen/parser.h>
 #include <rdfgen/interface.h>
+#include <rdfgen/structure.h>
+#include <rdfgen/generator.h>
 
 
 
@@ -19,10 +21,10 @@ int checkLeaf(table_t *table)
 	{
 		if(table->columns[i].FKtarget[0] != '\0')
 		{
-			return 1;
+			return 0;
 		}
 	}
-	return 0;
+	return 1;
 }
 
 // This function reads one row of a CSV file into a buffer. Return 1 if EOF is
@@ -35,7 +37,7 @@ int readRow(char *inputfile_map, int *cursor, field_t *row_buffer)
 	}
 	int cell = 0;
 	int _cursor = 0;
-	for(unsigned int i = *cursor; i < (((MAX_FIELD_LEN + 1) * MAX_COLUMNS) + cursor); i++)
+	for(unsigned int i = *cursor; i < (((MAX_FIELD_LEN + 1) * MAX_COLUMNS) + *cursor); i++)
 	{
 		if(*(inputfile_map + i) == '\n')
 		{
@@ -59,8 +61,10 @@ int readRow(char *inputfile_map, int *cursor, field_t *row_buffer)
 		else
 		{
 			(row_buffer + cell)->data[_cursor] = *(inputfile_map + i);
+			_cursor++;
 		}
 	}
+	return 1;
 }
 
 // This function generates triples for an anonymous leaf table.
@@ -69,42 +73,41 @@ void genTriples_anon_leaf(char *inputfile_map, int *cursor, FILE *outputfile, fi
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
 		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
-		for(int i = 0; i < table.totalColumns; i++)
+		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is column virtual?
-			if(table.columns[i].type == virt)
+			if(table->columns[i].type == virt)
 			{
-				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, table.columns[i].defaultValue, PREFIX, table.tableName, table.columns[i].columnname);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
-				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, (row_buffer + i)->data, PREFIX, table.tableName, table.columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 			// If not, must it?
-			else if(table.columns[i].type == req)
+			else if(table->columns[i].type == req)
 			{
 				// If it must, is there a default value?
-				if(table.columns[i].defaultValue[0] != '\0')
+				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, table.columns[i].defaultValue, PREFIX, table.tableName, table.columns[i].columnname);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 				}
 				// If not, warn the user.
 				else
 				{
-					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n");
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
 				}
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.tableName, table.columns[i].columnname);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
-	fprintf(outputfile, "\n\n<rdf:RDF>");
-	return 0;
 }
 
 // This function generates triples for an anonymous table.
@@ -113,66 +116,65 @@ void genTriples_anon(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
 		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
-		for(int i = 0; i < table.totalColumns; i++)
+		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is column virtual?
-			if(table.columns[i].type == virt)
+			if(table->columns[i].type == virt)
 			{
 				// Is it a foreign key?
-				if(table.columns[i].FKtarget[0] != '\0')
+				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.columns[i].FKtarget, table.columns[i].defaultValue);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, table.columns[i].defaultValue, PREFIX, table.tableName, table.columns[i].columnname);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 				}
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
 				// Is it a foreign key?
-				if(table.columns[i].FKtarget[0] != '\0')
+				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, (row_buffer + i)->data);
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, (row_buffer + i)->data, PREFIX, table.tableName, table.columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 				}
 			}
 			// If not, must it?
-			else if(table.columns[i].type == req)
+			else if(table->columns[i].type == req)
 			{
 				// If it must, is there a default value?
-				if(table.columns[i].defaultValue[0] != '\0')
+				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
 					// Is it a foreign key?
-					if(table.columns[i].FKtarget[0] != '\0')
+					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.columns[i].FKtarget, table.columns[i].defaultValue);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					}
 					else
 					{
-						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, table.columns[i].defaultValue, PREFIX, table.tableName, table.columns[i].columnname);
+						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					}
 				}
 				// If not, warn the user.
 				else
 				{
-					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n");
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
 				}
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.tableName, table.columns[i].columnname);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 		}
-		fprintf(outputfile, "</%s:%s\n", PREFIX, table->tableName);
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
-	fprintf(outputfile, "\n\n<rdf:RDF>");
-	return 0;
 }
 
 // This function generates triples for a leaf table.
@@ -180,48 +182,53 @@ void genTriples_leaf(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
+		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
+		{
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+			continue;
+		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
-		for(int i = 0; i < table.totalColumns; i++)
+		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
-			if(i == table.primaryIdentifier)
+			if(i == table->primaryIdentifier)
 			{
 				continue;
 			}
 			// Is column virtual?
-			else if(table.columns[i].type == virt)
+			else if(table->columns[i].type == virt)
 			{
-				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, table.columns[i].defaultValue, PREFIX, table.tableName, table.columns[i].columnname);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
-				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, (row_buffer + i)->data, PREFIX, table.tableName, table.columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 			// If not, must it?
-			else if(table.columns[i].type == req)
+			else if(table->columns[i].type == req)
 			{
 				// If it must, is there a default value?
-				if(table.columns[i].defaultValue[0] != '\0')
+				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, table.columns[i].defaultValue, PREFIX, table.tableName, table.columns[i].columnname);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 				}
 				// If not, warn the user.
 				else
 				{
-					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n");
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
 				}
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.tableName, table.columns[i].columnname);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
-	fprintf(outputfile, "\n\n<rdf:RDF>");
-	return 0;
 }
 
 // This function generates triples for a table whose PI is independent.
@@ -229,72 +236,77 @@ void genTriples(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
+		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
+		{
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+			continue;
+		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
-		for(int i = 0; i < table.totalColumns; i++)
+		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
-			if(i == table.primaryIdentifier)
+			if(i == table->primaryIdentifier)
 			{
 				continue;
 			}
 			// Is column virtual?
-			else if(table.columns[i].type == virt)
+			else if(table->columns[i].type == virt)
 			{
 				// Is it a foreign key?
-				if(table.columns[i].FKtarget[0] != '\0')
+				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.columns[i].FKtarget, table.columns[i].defaultValue);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, table.columns[i].defaultValue, PREFIX, table.tableName, table.columns[i].columnname);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 				}
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
 				// Is it a foreign key?
-				if(table.columns[i].FKtarget[0] != '\0')
+				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, (row_buffer + i)->data);
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, (row_buffer + i)->data, PREFIX, table.tableName, table.columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 				}
 			}
 			// If not, must it?
-			else if(table.columns[i].type == req)
+			else if(table->columns[i].type == req)
 			{
 				// If it must, is there a default value?
-				if(table.columns[i].defaultValue[0] != '\0')
+				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
 					// Is it a foreign key?
-					if(table.columns[i].FKtarget[0] != '\0')
+					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.columns[i].FKtarget, table.columns[i].defaultValue);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					}
 					else
 					{
-						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, table.columns[i].defaultValue, PREFIX, table.tableName, table.columns[i].columnname);
+						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					}
 				}
 				// If not, warn the user.
 				else
 				{
-					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n");
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
 				}
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.tableName, table.columns[i].columnname);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 		}
-		fprintf(outputfile, "</%s:%s\n", PREFIX, table->tableName);
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
-	fprintf(outputfile, "\n\n<rdf:RDF>");
-	return 0;
 }
 
 // This function generates triples for a table whose PI is an FK.
@@ -302,73 +314,78 @@ void genTriples_pifk(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
+		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
+		{
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+			continue;
+		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
-		for(int i = 0; i < table.totalColumns; i++)
+		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
-			if(i == table.primaryIdentifier)
+			if(i == table->primaryIdentifier)
 			{
 				continue;
 			}
 			// Is column virtual?
-			else if(table.columns[i].type == virt)
+			else if(table->columns[i].type == virt)
 			{
 				// Is it a foreign key?
-				if(table.columns[i].FKtarget[0] != '\0')
+				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.columns[i].FKtarget, table.columns[i].defaultValue);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, table.columns[i].defaultValue, PREFIX, table.tableName, table.columns[i].columnname);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 				}
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
 				// Is it a foreign key?
-				if(table.columns[i].FKtarget[0] != '\0')
+				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, (row_buffer + i)->data);
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, (row_buffer + i)->data, PREFIX, table.tableName, table.columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 				}
 			}
 			// If not, must it?
-			else if(table.columns[i].type == req)
+			else if(table->columns[i].type == req)
 			{
 				// If it must, is there a default value?
-				if(table.columns[i].defaultValue[0] != '\0')
+				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
 					// Is it a foreign key?
-					if(table.columns[i].FKtarget[0] != '\0')
+					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.columns[i].FKtarget, table.columns[i].defaultValue);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=%s:%s_%s/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					}
 					else
 					{
-						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, table.columns[i].defaultValue, PREFIX, table.tableName, table.columns[i].columnname);
+						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					}
 				}
 				// If not, warn the user.
 				else
 				{
-					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n");
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
 				}
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table.tableName, table.columns[i].columnName, PREFIX, table.tableName, table.columns[i].columnname);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
 		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
-		fprintf(outputfile, "  <%s:%s rdf:resource=%s:%s_%s/>\n", PREFIX, table->tableName, PREFIX, table->tableName, (row_buffer + (table->primaryIdentifier)->data));
+		fprintf(outputfile, "  <%s:%s rdf:resource=%s:%s_%s/>\n", PREFIX, table->tableName, PREFIX, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
-	fprintf(outputfile, "\n\n<rdf:RDF>");
-	return 0;
 }
