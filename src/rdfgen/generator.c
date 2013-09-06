@@ -12,6 +12,19 @@
 
 
 
+// Return 1 if table has no FKs, 0 otherwise.
+int checkLeaf(table_t *table)
+{
+	for(int i = 0; i < table->totalColumns; i++)
+	{
+		if(table->columns[i].FKtarget[0] != '\0')
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
 // This function reads one row of a CSV file into a buffer. Return 1 if EOF is
 // found, 0 otherwise. Undefined behavior if a cell if bigger than MAX_FIELD_LEN!
 int readRow(char *inputfile_map, int *cursor, field_t *row_buffer)
