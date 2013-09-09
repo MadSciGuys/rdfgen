@@ -238,7 +238,14 @@ void outputHeader(FILE *outputfile, table_t *table)
 		}
 		else
 		{
-			fprintf(outputfile, "<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"%s\"/>\n</rdf:Property>\n\n", table->tableName, table->columns[i].columnName, table->tableName);
+			if(table->columns[i].FKtarget[0] == '\0')
+			{
+				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"%s\"/>\n</rdf:Property>\n\n", table->tableName, table->columns[i].columnName, table->tableName);
+			}
+			else
+			{
+				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n", table->tableName, table->columns[i].columnName, table->tableName, table->columns[i].FKtarget);
+			}
 		}
 	}
 	return;
