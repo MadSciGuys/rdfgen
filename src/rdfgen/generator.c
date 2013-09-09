@@ -102,7 +102,7 @@ void genTriples_anon_leaf(char *inputfile_map, int *cursor, FILE *outputfile, fi
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>#!NULL!#</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -169,7 +169,7 @@ void genTriples_anon(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>#!NULL!#</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -223,7 +223,7 @@ void genTriples_leaf(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>#!NULL!#</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -301,7 +301,7 @@ void genTriples(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>#!NULL!#</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -379,7 +379,7 @@ void genTriples_pifk(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>#!NULL!#></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
