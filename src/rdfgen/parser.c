@@ -369,6 +369,7 @@ int defineDV(char *arg1, char *arg2, table_t *table)
 	}
 	else
 	{
+		table->columns[colnum].type = req;
 		memset(table->columns[colnum].defaultValue.data, '\0', MAX_FIELD_LEN + 1);
 		strncpy(table->columns[colnum].defaultValue.data, arg2, MAX_FIELD_LEN + 1);
 		return 0;
