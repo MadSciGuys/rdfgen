@@ -13,7 +13,7 @@
 #define DOCTYPE "<!DOCTYPE rdf:RDF [<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\">]>"
 
 // RDF namespace string:
-#define RDF_NAMESPACES "<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://www.jnj.com/DWH/schema\"\n  xmlns:DWH=\"http://www.jnj.com/DWH/DWH#\">"
+#define RDF_NAMESPACES "<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://www.jnj.com/DWH/DWH\"\n  xmlns:DWH=\"http://www.jnj.com/DWH/schema#\">"
 
 // RDF NS prefix:
 #define PREFIX "DWH"
