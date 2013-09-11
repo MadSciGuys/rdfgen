@@ -216,8 +216,10 @@ int main(int argc, char *argv[])
 			printf("\n");
 		}
 		// Output the RDF header:
+		printf("Writing header...\n");
 		outputHeader(outputfile, table);
 		// Output the RDF triples:
+		printf("Generating triples...\n");
 		outputTriples(outputfile, inputfile_map, table, row_buffer);
 		// Clean up after this iteration:
 		fclose(outputfile);
