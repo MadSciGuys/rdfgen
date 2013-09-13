@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
 		printf("Columns:\n");
 		for(int i = 0; i < table->totalColumns; i++)
 		{
-			printf("\t%d: %s(", i + 1, table->columns[i].columnName);
+			printf("%d: %s\t\t\t", i + 1, table->columns[i].columnName);
 			switch(table->columns[i].type)
 			{
 			case real:
@@ -193,14 +193,14 @@ int main(int argc, char *argv[])
 				printf("!!!!");
 				break;
 			}
-			printf(")\t\t\t");
+			printf("\t\t\t");
 			switch(table->columns[i].FKtarget[0])
 			{
 			case '\0':
 				printf("Independent");
 				break;
 			default:
-				printf("----->%s",table->columns[i].FKtarget);
+				printf("------->%s",table->columns[i].FKtarget);
 				break;
 			}
 			printf("\t\t\t");
