@@ -164,6 +164,7 @@ int main(int argc, char *argv[])
 			printf("File I/O error!\nUnable to open output file %s\nFATAL ERROR\n", argv[currentArg]);
 			return 1;
 		}
+		// Print some table details for debugging purposes:
 		printf("Table name: %s\n", table->tableName);
 		printf("Number of columns: %d\n", table->totalColumns);
 		if(table->primaryIdentifier == -1)
