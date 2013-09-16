@@ -72,6 +72,12 @@ int main(int argc, char *argv[])
 		printf("Memory map error!\nUnable to create map for schema file %s\nFATAL ERROR\n", argv[1]);
 		return 1;
 	}
+	// Set page cache mode:
+	if(madvise(schemafile_map, schemafile_stat.st_size, MADV_SEQUENTIAL) == -1)
+	{
+		printf("Page cache mode set error!\nUnable to set MADV_SEQUENTIAL page cache optimization mode.\nFATAL ERROR\n");
+		return 1;
+	}
 	// Allocate memory for the table metadata:
 	table_t *table = malloc(sizeof(*table));
 	if(table == NULL)
@@ -118,6 +124,12 @@ int main(int argc, char *argv[])
 		if(inputfile_map == MAP_FAILED)
 		{
 			printf("Memory map error!\nUnable to create map for input file %s\nFATAL ERROR\n", argv[currentArg]);
+			return 1;
+		}
+		// Set page cache mode:
+		if(madvise(inputfile_map, inputfile_stat.st_size, MADV_SEQUENTIAL) == -1)
+		{
+			printf("Page cache mode set error!\nUnable to set MADV_SEQUENTIAL page cache optimization mode.\nFATAL ERROR\n");
 			return 1;
 		}
 		// Check to make sure the input file has data in it:
