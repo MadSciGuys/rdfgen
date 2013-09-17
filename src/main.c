@@ -141,6 +141,11 @@ int main(int argc, char *argv[])
 		else if(checkEmpty(inputfile_map) == 1)
 		{
 			printf("Input file error!\nFile %s contains no data.\nContinuing...\n", argv[currentArg]);
+			char *emptyfilename = malloc(MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1 + 7);
+			strcat(emptyfilename, outputfilename);
+			strcat(emptyfilename, ".empty");
+			rename(outputfilename, emptyfilename);
+			free(emptyfilename);
 			// Clean up after this iteration:
 			memset(outputfilename, '\0', MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1);
 			memset(table, '\0', sizeof(*table));
