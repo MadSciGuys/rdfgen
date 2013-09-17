@@ -18,6 +18,9 @@
 // RDF NS prefix:
 #define PREFIX "DWH"
 
+// RDF base:
+#define BASE "http://www.jnj.com/DWH/DWH"
+
 #include <rdfgen/interface.h>
 
 

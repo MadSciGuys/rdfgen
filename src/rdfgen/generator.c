@@ -150,7 +150,7 @@ void genTriples_anon(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 				}
 				else
 				{
@@ -163,7 +163,7 @@ void genTriples_anon(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 				}
 				else
 				{
@@ -179,7 +179,7 @@ void genTriples_anon(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					}
 					else
 					{
@@ -282,7 +282,7 @@ void genTriples(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 				}
 				else
 				{
@@ -295,7 +295,7 @@ void genTriples(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 				}
 				else
 				{
@@ -311,7 +311,7 @@ void genTriples(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					}
 					else
 					{
@@ -360,7 +360,7 @@ void genTriples_pifk(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 				}
 				else
 				{
@@ -373,7 +373,7 @@ void genTriples_pifk(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 				}
 				else
 				{
@@ -389,7 +389,7 @@ void genTriples_pifk(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					}
 					else
 					{
@@ -410,7 +410,7 @@ void genTriples_pifk(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
 		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
-		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, PREFIX, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
 		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
@@ -472,7 +472,7 @@ void genTriples_anon_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 				}
 				else
 				{
@@ -488,7 +488,7 @@ void genTriples_anon_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					}
 					else
 					{
@@ -586,7 +586,7 @@ void genTriples_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, fiel
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 				}
 				else
 				{
@@ -602,7 +602,7 @@ void genTriples_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, fiel
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					}
 					else
 					{
@@ -651,7 +651,7 @@ void genTriples_pifk_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 				}
 				else
 				{
@@ -667,7 +667,7 @@ void genTriples_pifk_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					}
 					else
 					{
@@ -688,7 +688,7 @@ void genTriples_pifk_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
 		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
-		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s:%s_%s\"/>\n", PREFIX, table->tableName, PREFIX, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s/%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
 		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
