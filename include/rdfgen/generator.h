@@ -36,10 +36,22 @@ void genTriples_anon(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 void genTriples_anon_leaf(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
 void genTriples_leaf(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
 
+void genTriples_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_pifk_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+
 void genTriples_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
 void genTriples_pifk_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
 void genTriples_anon_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
 void genTriples_anon_leaf_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
 void genTriples_leaf_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+
+void genTriples_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_pifk_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
 
 #endif
