@@ -24,6 +24,7 @@
 
 int checkLeaf(table_t *table);
 int checkVirt(table_t *table);
+int checkReq(table_t *table);
 int readRow(char *inputfile_map, int *cursor, field_t *row_buffer);
 
 void genTriples(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);

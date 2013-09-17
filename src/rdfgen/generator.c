@@ -40,6 +40,19 @@ int checkVirt(table_t *table)
 	return 1;
 }
 
+// Return 1 if table has no required columns(except for the PI if there is one), 0 othersize.
+int checkReq(table_t *table)
+{
+	for(int i = 0; i < table->totalColumns; i++)
+	{
+		if(table->columns[i].type == req && i != table->primaryIdentifier)
+		{
+			return 0;
+		}
+	}
+	return 1;
+}
+
 // This function reads one row of a CSV file into a buffer. Return 1 if EOF is
 // found, 0 otherwise. Undefined behavior if a cell if bigger than MAX_FIELD_LEN!
 int readRow(char *inputfile_map, int *cursor, field_t *row_buffer)
