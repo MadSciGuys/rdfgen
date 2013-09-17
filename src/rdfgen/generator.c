@@ -693,3 +693,422 @@ void genTriples_pifk_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
+
+
+
+// These functions assume there are no required columns(except for the FK):
+
+
+
+// This function generates triples for an anonymous leaf table.
+void genTriples_anon_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+{
+	while(readRow(inputfile_map, cursor, row_buffer) != 1)
+	{
+		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		for(int i = 0; i < table->totalColumns; i++)
+		{
+			// Is column virtual?
+			if(table->columns[i].type == virt)
+			{
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+			// If not, does it have a value?
+			else if((row_buffer + i)->data[0] != '\0')
+			{
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+			// If not, write nil:
+			else
+			{
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+		}
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+	}
+}
+
+// This function generates triples for an anonymous table.
+void genTriples_anon_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+{
+	while(readRow(inputfile_map, cursor, row_buffer) != 1)
+	{
+		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		for(int i = 0; i < table->totalColumns; i++)
+		{
+			// Is column virtual?
+			if(table->columns[i].type == virt)
+			{
+				// Is it a foreign key?
+				if(table->columns[i].FKtarget[0] != '\0')
+				{
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+				}
+				else
+				{
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+				}
+			}
+			// If not, does it have a value?
+			else if((row_buffer + i)->data[0] != '\0')
+			{
+				// Is it a foreign key?
+				if(table->columns[i].FKtarget[0] != '\0')
+				{
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+				}
+				else
+				{
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				}
+			}
+			// If not, write nil:
+			else
+			{
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+		}
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+	}
+}
+
+// This function generates triples for a leaf table.
+void genTriples_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+{
+	while(readRow(inputfile_map, cursor, row_buffer) != 1)
+	{
+		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
+		{
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+			continue;
+		}
+		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		for(int i = 0; i < table->totalColumns; i++)
+		{
+			// Is this the PI?
+			if(i == table->primaryIdentifier)
+			{
+				continue;
+			}
+			// Is column virtual?
+			else if(table->columns[i].type == virt)
+			{
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+			// If not, does it have a value?
+			else if((row_buffer + i)->data[0] != '\0')
+			{
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+			// If not, write nil:
+			else
+			{
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+		}
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+	}
+}
+
+// This function generates triples for a table whose PI is independent.
+void genTriples_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+{
+	while(readRow(inputfile_map, cursor, row_buffer) != 1)
+	{
+		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
+		{
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+			continue;
+		}
+		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		for(int i = 0; i < table->totalColumns; i++)
+		{
+			// Is this the PI?
+			if(i == table->primaryIdentifier)
+			{
+				continue;
+			}
+			// Is column virtual?
+			else if(table->columns[i].type == virt)
+			{
+				// Is it a foreign key?
+				if(table->columns[i].FKtarget[0] != '\0')
+				{
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+				}
+				else
+				{
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+				}
+			}
+			// If not, does it have a value?
+			else if((row_buffer + i)->data[0] != '\0')
+			{
+				// Is it a foreign key?
+				if(table->columns[i].FKtarget[0] != '\0')
+				{
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+				}
+				else
+				{
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				}
+			}
+			// If not, write nil:
+			else
+			{
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+		}
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+	}
+}
+
+// This function generates triples for a table whose PI is an FK.
+void genTriples_pifk_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+{
+	while(readRow(inputfile_map, cursor, row_buffer) != 1)
+	{
+		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
+		{
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+			continue;
+		}
+		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		for(int i = 0; i < table->totalColumns; i++)
+		{
+			// Is this the PI?
+			if(i == table->primaryIdentifier)
+			{
+				continue;
+			}
+			// Is column virtual?
+			else if(table->columns[i].type == virt)
+			{
+				// Is it a foreign key?
+				if(table->columns[i].FKtarget[0] != '\0')
+				{
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+				}
+				else
+				{
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+				}
+			}
+			// If not, does it have a value?
+			else if((row_buffer + i)->data[0] != '\0')
+			{
+				// Is it a foreign key?
+				if(table->columns[i].FKtarget[0] != '\0')
+				{
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+				}
+				else
+				{
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				}
+			}
+			// If not, write nil:
+			else
+			{
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+		}
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
+		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+	}
+}
+
+
+//These functions assume there are no virtual columns:
+
+
+// This function generates triples for an anonymous leaf table.
+void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+{
+	while(readRow(inputfile_map, cursor, row_buffer) != 1)
+	{
+		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		for(int i = 0; i < table->totalColumns; i++)
+		{
+			// Does it have a value?
+			if((row_buffer + i)->data[0] != '\0')
+			{
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+			// If not, write nil:
+			else
+			{
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+		}
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+	}
+}
+
+// This function generates triples for an anonymous table.
+void genTriples_anon_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+{
+	while(readRow(inputfile_map, cursor, row_buffer) != 1)
+	{
+		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		for(int i = 0; i < table->totalColumns; i++)
+		{
+			// Does it have a value?
+			if((row_buffer + i)->data[0] != '\0')
+			{
+				// Is it a foreign key?
+				if(table->columns[i].FKtarget[0] != '\0')
+				{
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+				}
+				else
+				{
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				}
+			}
+			// If not, write nil:
+			else
+			{
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+		}
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+	}
+}
+
+// This function generates triples for a leaf table.
+void genTriples_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+{
+	while(readRow(inputfile_map, cursor, row_buffer) != 1)
+	{
+		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
+		{
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+			continue;
+		}
+		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		for(int i = 0; i < table->totalColumns; i++)
+		{
+			// Is this the PI?
+			if(i == table->primaryIdentifier)
+			{
+				continue;
+			}
+			// If not, does it have a value?
+			else if((row_buffer + i)->data[0] != '\0')
+			{
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+			// If not, write nil:
+			else
+			{
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+		}
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+	}
+}
+
+// This function generates triples for a table whose PI is independent.
+void genTriples_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+{
+	while(readRow(inputfile_map, cursor, row_buffer) != 1)
+	{
+		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
+		{
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+			continue;
+		}
+		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		for(int i = 0; i < table->totalColumns; i++)
+		{
+			// Is this the PI?
+			if(i == table->primaryIdentifier)
+			{
+				continue;
+			}
+			// If not, does it have a value?
+			else if((row_buffer + i)->data[0] != '\0')
+			{
+				// Is it a foreign key?
+				if(table->columns[i].FKtarget[0] != '\0')
+				{
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+				}
+				else
+				{
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				}
+			}
+			// If not, write nil:
+			else
+			{
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+		}
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+	}
+}
+
+// This function generates triples for a table whose PI is an FK.
+void genTriples_pifk_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+{
+	while(readRow(inputfile_map, cursor, row_buffer) != 1)
+	{
+		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
+		{
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+			continue;
+		}
+		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		for(int i = 0; i < table->totalColumns; i++)
+		{
+			// Is this the PI?
+			if(i == table->primaryIdentifier)
+			{
+				continue;
+			}
+			// If not, does it have a value?
+			else if((row_buffer + i)->data[0] != '\0')
+			{
+				// Is it a foreign key?
+				if(table->columns[i].FKtarget[0] != '\0')
+				{
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+				}
+				else
+				{
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				}
+			}
+			// If not, write nil:
+			else
+			{
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+			}
+		}
+		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
+		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
+		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
+		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
+	}
+}

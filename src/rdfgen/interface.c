@@ -334,6 +334,7 @@ void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_
 					genTriples_no_virt_no_req(inputfile_map, &cursor, outputfile, row_buffer, table);
 				}
 			}
+		}
 	}
 	else
 	{
