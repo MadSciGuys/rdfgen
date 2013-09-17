@@ -195,20 +195,20 @@ int main(int argc, char *argv[])
 		printf("Columns:\n");
 		for(int i = 0; i < table->totalColumns; i++)
 		{
-			printf("%d: %-34s", i + 1, table->columns[i].columnName);
+			printf("%4d:%-32s", i + 1, table->columns[i].columnName);
 			switch(table->columns[i].type)
 			{
 			case real:
-				printf("%-8s","real");
+				printf("%-6s","real");
 				break;
 			case req:
-				printf("%-8s","req");
+				printf("%-6s","req");
 				break;
 			case virt:
-				printf("%-8s","virt");
+				printf("%-6s","virt");
 				break;
 			default:
-				printf("%-8s","!!!!");
+				printf("%-6s","!!!!");
 				break;
 			}
 			switch(table->columns[i].FKtarget[0])
@@ -238,6 +238,7 @@ int main(int argc, char *argv[])
 		printf("Generating triples...\n");
 		outputTriples(outputfile, inputfile_map, table, row_buffer);
 		// Clean up after this iteration:
+		printf("Finished %s.\n",outputfilename);
 		fclose(outputfile);
 		memset(outputfilename, '\0', MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1);
 		memset(table, '\0', sizeof(table));
