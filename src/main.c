@@ -195,37 +195,35 @@ int main(int argc, char *argv[])
 		printf("Columns:\n");
 		for(int i = 0; i < table->totalColumns; i++)
 		{
-			printf("%d: %s\t\t\t", i + 1, table->columns[i].columnName);
+			printf("%d: %-34s", i + 1, table->columns[i].columnName);
 			switch(table->columns[i].type)
 			{
 			case real:
-				printf("real");
+				printf("%-8s","real");
 				break;
 			case req:
-				printf("req");
+				printf("%-8s","req");
 				break;
 			case virt:
-				printf("virt");
+				printf("%-8s","virt");
 				break;
 			default:
-				printf("!!!!");
+				printf("%-8s","!!!!");
 				break;
 			}
-			printf("\t\t\t");
 			switch(table->columns[i].FKtarget[0])
 			{
 			case '\0':
-				printf("Independent");
+				printf("%-36s","Independent");
 				break;
 			default:
-				printf("------->%s",table->columns[i].FKtarget);
+				printf("->%-34s",table->columns[i].FKtarget);
 				break;
 			}
-			printf("\t\t\t");
 			switch(table->columns[i].defaultValue.data[0])
 			{
 			case '\0':
-				printf("No default value");
+				printf("no default value");
 				break;
 			default:
 				printf("default value: %s", table->columns[i].defaultValue.data);
