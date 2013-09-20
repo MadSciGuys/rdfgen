@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
 	// The output file is not memory mapped, so it gets a file pointer:
 	FILE *outputfile;
-	// Save a little memory for the output filename:
+	// Stack space for the output filename:
 	char outputfilename[MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1];
 
 	// Pointers for memory maps:
@@ -59,20 +59,20 @@ int main(int argc, char *argv[])
 		printf("File I/O error!\nUnable to open schema file %s\nFATAL ERROR\n", argv[1]);
 		return 1;
 	}
-	// Ask the kernel to stat the file:
+	// Get file stats:
 	if(fstat(schemafile_fd, &schemafile_stat) == -1)
 	{
 		printf("File I/O error!\nUnable to stat schema file %s\nFATAL ERROR\n", argv[1]);
 		return 1;
 	}
-	// Ask the kernel to map the memory:
+	// Create memory map:
 	schemafile_map = mmap(NULL, schemafile_stat.st_size, PROT_READ, MAP_PRIVATE, schemafile_fd, 0);
 	if(schemafile_map == MAP_FAILED)
 	{
 		printf("Memory map error!\nUnable to create map for schema file %s\nFATAL ERROR\n", argv[1]);
 		return 1;
 	}
-	// Set page cache mode:
+	// Attempt to set page cache mode:
 	if(madvise(schemafile_map, schemafile_stat.st_size, MADV_SEQUENTIAL) == -1)
 	{
 		printf("Page cache mode set error!\nUnable to set MADV_SEQUENTIAL page cache optimization mode.\nFATAL ERROR\n");
