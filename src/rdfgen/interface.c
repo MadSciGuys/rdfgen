@@ -136,7 +136,7 @@ int getColumnNames(char *inputfile_map, table_t *table)
 // error, relying on other functions to report the specific error:
 int getTableMetadata(char *schemafile_map, table_t *table)
 {
-	int cursor; // Keep track of our place between function calls.
+	int cursor = 0; // Keep track of our place between function calls.
 	char op; // Keep track of the operator for this line.
 	char arg1[MAX_COLUMN_NAME_LEN + 1]; // First argument is always a column name.
 	char arg2[MAX_FIELD_LEN + 1]; // Second argument may be a column name or default field value.

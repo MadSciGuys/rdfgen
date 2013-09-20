@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 		// Open the input file:
 		inputfile_fd = open(argv[currentArg], O_READ_FLAGS);
 		// Make sure that worked:
-		if(schemafile_fd == -1)
+		if(inputfile_fd == -1)
 		{
 			printf("File I/O error!\nUnable to open input file %s\nFATAL ERROR\n", argv[currentArg]);
 			return 1;
@@ -241,7 +241,7 @@ int main(int argc, char *argv[])
 		printf("Finished %s.\n",outputfilename);
 		fclose(outputfile);
 		memset(outputfilename, '\0', MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1);
-		memset(table, '\0', sizeof(table));
+		memset(table, '\0', sizeof(*table));
 		if(munmap(inputfile_map, inputfile_stat.st_size) == -1)
 		{
 			printf("Memory map error!\nUnable to unmap input file %s\nFATAL ERROR\n",argv[currentArg]);
