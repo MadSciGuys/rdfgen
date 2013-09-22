@@ -10,6 +10,7 @@
 #include <rdfgen/interface.h>
 #include <rdfgen/parser.h>
 #include <rdfgen/structure.h>
+#include <rdfgen/color.h>
 
 
 
@@ -27,7 +28,7 @@ int schemaSeek(char *schemafile_map, char *tableName, int *cursor)
 			{
 				if(*(schemafile_map + _cursor) == '\0')
 				{
-					printf("Schema file error!\nUnexpected EOF at position 0x%x\n", _cursor);
+					printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, _cursor);
 					return 1;
 				}
 				_cursor++;
@@ -45,7 +46,7 @@ int schemaSeek(char *schemafile_map, char *tableName, int *cursor)
 					*cursor = _cursor;
 					if(*(schemafile_map + *cursor) != '\t')
 					{
-						printf("Schema file error!\nMalformed line at position 0x%x found by schemaSeek()\n", *cursor);
+						printf(BOLD RED "Schema file error!\nMalformed line at position 0x%x found by schemaSeek()\n" RESET, *cursor);
 						return 1;
 					}
 					return 0;
@@ -60,7 +61,7 @@ int schemaSeek(char *schemafile_map, char *tableName, int *cursor)
 					{
 						if(*(schemafile_map + _cursor) == '\0')
 						{
-							printf("Schema file error!\nUnexpected EOF at position 0x%x\n", _cursor);
+							printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, _cursor);
 							break;
 						}
 						_cursor++;
@@ -72,11 +73,11 @@ int schemaSeek(char *schemafile_map, char *tableName, int *cursor)
 		}
 		else
 		{
-			printf("Schema file error!\nFound line that does not begin with ~, !, or tab\n");
+			printf(BOLD RED "Schema file error!\nFound line that does not begin with ~, !, or tab\n" RESET);
 			return 1;
 		}
 	}
-	printf("Schema file error!\nTable %s not found in schema file.\n", tableName);
+	printf(BOLD RED "Schema file error!\nTable %s not found in schema file.\n" RESET, tableName);
 	return 1;
 }
 
@@ -93,8 +94,8 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 	_cursor++;
 	if(*(schemafile_map + _cursor) != '!')
 	{
-		printf("Schema file error!\nNo Primary Identifier defined in schema file for table %s\n", table->tableName);
-		printf("Found [[[%c]]] instead...\n", *(schemafile_map + _cursor));
+		printf(BOLD RED "Schema file error!\nNo Primary Identifier defined in schema file for table %s\n" RESET, table->tableName);
+		printf(BOLD YELLOW "Found [[[%c]]] instead...\n" RESET, *(schemafile_map + _cursor));
 		return 1;
 	}
 	_cursor++;
@@ -104,7 +105,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 		_cursor++;
 		if(*(schemafile_map + _cursor) != '\n')
 		{
-			printf("Schema file error!\nUnexpected char at position 0x%x\n", _cursor);
+			printf(BOLD RED "Schema file error!\nUnexpected char at position 0x%x\n" RESET, _cursor);
 			return 1;
 		}
 		_cursor++;
@@ -125,7 +126,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 		}
 		else if(*(schemafile_map + _cursor) == '\0')
 		{
-			printf("Schema file error!\nUnexpected EOF at position 0x%x\n", _cursor);
+			printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, _cursor);
 			return 1;
 		}
 		else
@@ -136,7 +137,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 	}
 	if(PIname[MAX_COLUMN_NAME_LEN] != '\0')
 	{
-		printf("Schema file error!\nTable %s: Primary Identifier too long.\n", table->tableName);
+		printf(BOLD RED "Schema file error!\nTable %s: Primary Identifier too long.\n" RESET, table->tableName);
 		return 1;
 	}
 	for(int i = 0; i < MAX_COLUMNS; i++)
@@ -150,7 +151,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 	}
 	if(table->primaryIdentifier == -2)
 	{
-		printf("Schema file error!\nTable %s: Primary Identifier %s not found in table file.\n", table->tableName,PIname);
+		printf(BOLD RED "Schema file error!\nTable %s: Primary Identifier %s not found in table file.\n" RESET, table->tableName,PIname);
 		return 1;
 	}
 	if(*(schemafile_map + _cursor) == '\n')
@@ -171,7 +172,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 			}
 			else if(*(schemafile_map + _cursor) == '\0')
 			{
-				printf("Schema file error!\nUnexpected EOF at position 0x%x\n", _cursor);
+				printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, _cursor);
 				return 1;
 			}
 			else
@@ -182,7 +183,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 		}
 		if(FKname[MAX_TABLE_NAME_LEN] != '\0')
 		{
-			printf("Schema file error!\nTable %s: Foreign Key for Primary Identifier %s is too long.\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+			printf(BOLD RED "Schema file error!\nTable %s: Foreign Key for Primary Identifier %s is too long.\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
 			return 1;
 		}
 		strncpy(table->columns[table->primaryIdentifier].FKtarget,FKname,MAX_TABLE_NAME_LEN + 1);
@@ -192,7 +193,7 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 	}
 	else
 	{
-	printf("Schema file error!\nUnexpected char at position 0x%x\n", _cursor);
+	printf(BOLD RED "Schema file error!\nUnexpected char at position 0x%x\n" RESET, _cursor);
 	return 1;
 	}
 }
@@ -214,7 +215,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, int 
 		}
 		else
 		{
-			printf("Schema file error!\nMalformed line at position 0x%x found by schemaFetchLine()\n", _cursor);
+			printf(BOLD RED "Schema file error!\nMalformed line at position 0x%x found by schemaFetchLine()\n" RESET, _cursor);
 			return 1;
 		}
 	}
@@ -223,12 +224,12 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, int 
 	{
 		if(*(schemafile_map + _cursor) == '!')
 		{
-			printf("Schema file error!\nUnexpected '!' at position 0x%x\n", _cursor);
+			printf(BOLD RED "Schema file error!\nUnexpected '!' at position 0x%x\n" RESET, _cursor);
 			return 1;
 		}
 		else if(*(schemafile_map + _cursor) == '\n')
 		{
-			printf("Schema file error!\nUnexpected line feed at position 0x%x\n", _cursor);
+			printf(BOLD RED "Schema file error!\nUnexpected line feed at position 0x%x\n" RESET, _cursor);
 			return 1;
 		}
 		else if(*(schemafile_map + _cursor) == '>' || *(schemafile_map + _cursor) == '?' || *(schemafile_map + _cursor) == '*' || *(schemafile_map + _cursor) == '@' || *(schemafile_map + _cursor) == '&')
@@ -259,7 +260,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, int 
 		}
 		else
 		{
-			printf("Schema file error!\nInitial argument too long.\n");
+			printf(BOLD RED "Schema file error!\nInitial argument too long.\n" RESET);
 			return 1;
 		}
 	}
@@ -273,7 +274,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, int 
 		}
 		else if(*(schemafile_map + _cursor) == '!' || *(schemafile_map + _cursor) == '>' || *(schemafile_map + _cursor) == '?' || *(schemafile_map + _cursor) == '*' || *(schemafile_map + _cursor) == '@' || *(schemafile_map + _cursor) == '&')
 		{
-			printf("Schema file error!\nToo many arguments!\n");
+			printf(BOLD RED "Schema file error!\nToo many arguments!\n" RESET);
 			return 1;
 		}
 		else
@@ -286,7 +287,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, int 
 	{
 		if(arg2[MAX_COLUMN_NAME_LEN] != '\0')
 		{
-			printf("Schema file error!\nNew name for column %s is too long.\n", arg1);
+			printf(BOLD RED "Schema file error!\nNew name for column %s is too long.\n" RESET, arg1);
 			return 1;
 		}
 	}
@@ -294,7 +295,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, int 
 	{
 		if(arg2[MAX_FIELD_LEN] != '\0')
 		{
-			printf("Schema file error!\nDefault value for column %s is too long.\n", arg1);
+			printf(BOLD RED "Schema file error!\nDefault value for column %s is too long.\n" RESET, arg1);
 			return 1;
 		}
 	}
@@ -302,7 +303,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, int 
 	{
 		if(arg2[MAX_TABLE_NAME_LEN] != '\0')
 		{
-			printf("Schema file error!\nForeign Key target name for column %s is too long.\n", arg1);
+			printf(BOLD RED "Schema file error!\nForeign Key target name for column %s is too long.\n" RESET, arg1);
 			return 1;
 		}
 	}
@@ -333,7 +334,7 @@ int renameColumn(char *arg1, char *arg2, table_t *table)
 	}
 	if(colnum == -1)
 	{
-		printf("Column rename error!\nColumn name %s not found in table %s\n", arg1, table->tableName);
+		printf(BOLD RED "Column rename error!\nColumn name %s not found in table %s\n" RESET, arg1, table->tableName);
 		return 1;
 	}
 	else
@@ -359,12 +360,12 @@ int defineDV(char *arg1, char *arg2, table_t *table)
 	}
 	if(colnum == -1)
 	{
-		printf("Column default value assignment error!\nColumn name %s not found in table %s\n", arg1, table->tableName);
+		printf(BOLD RED "Column default value assignment error!\nColumn name %s not found in table %s\n" RESET, arg1, table->tableName);
 		return 1;
 	}
 	else if(colnum == table->primaryIdentifier)
 	{
-		printf("Column default value assignment error!\nColumn %s is the Primary Identifier and cannot have a default value.\n", arg1);
+		printf(BOLD RED "Column default value assignment error!\nColumn %s is the Primary Identifier and cannot have a default value.\n" RESET, arg1);
 		return 1;
 	}
 	else
@@ -391,12 +392,12 @@ int requireColumn(char *arg1, table_t *table)
 	}
 	if(colnum == -1)
 	{
-		printf("Column requirement spec error!\nColumn name %s not found in table %s\n", arg1, table->tableName);
+		printf(BOLD RED "Column requirement spec error!\nColumn name %s not found in table %s\n" RESET, arg1, table->tableName);
 		return 1;
 	}
 	else if(colnum == table->primaryIdentifier)
 	{
-		printf("Column requirement spec error!\nColumn %s is the Primary Identifier and has a static type.\n", arg1);
+		printf(BOLD RED "Column requirement spec error!\nColumn %s is the Primary Identifier and has a static type.\n" RESET, arg1);
 		return 1;
 	}
 	else
@@ -420,7 +421,7 @@ int defineFK(char *arg1, char *arg2, table_t *table)
 	}
 	if(colnum == -1)
 	{
-		printf("Column FK target assignment error!\nColumn name %s not found in table %s\n", arg1, table->tableName);
+		printf(BOLD RED "Column FK target assignment error!\nColumn name %s not found in table %s\n" RESET, arg1, table->tableName);
 		return 1;
 	}
 	else
@@ -437,7 +438,7 @@ int defineVC(char *arg1, char *arg2, table_t *table)
 {
 	if((table->totalColumns + 1) > MAX_COLUMNS)
 	{
-		printf("Virtual column definition error!\nMAX_COLUMNS EXCEEDED!\n");
+		printf(BOLD RED "Virtual column definition error!\n" REVERSE BLINK "MAX_COLUMNS EXCEEDED!\n" RESET);
 		return 1;
 	}
 	table->totalColumns = (table->totalColumns + 1);

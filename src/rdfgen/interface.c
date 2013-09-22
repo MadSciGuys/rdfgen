@@ -11,6 +11,7 @@
 #include <rdfgen/interface.h>
 #include <rdfgen/structure.h>
 #include <rdfgen/generator.h>
+#include <rdfgen/color.h>
 
 
 
@@ -35,7 +36,7 @@ int getTableName(char *inputfilename, char *outputfilename, table_t *table)
 	// If the last char isn't null, then the table name was too long:
 	if(table->tableName[MAX_TABLE_NAME_LEN] != '\0')
 	{
-		printf("File name error!\nThe table name in file %s is too long.\n", inputfilename);
+		printf(BOLD RED "File name error!\nThe table name in file %s is too long.\n" RESET, inputfilename);
 		return -1;
 	}
 	// Now make the output file name:
@@ -70,7 +71,7 @@ int checkEmpty(char *inputfile_map)
 	// Make sure we didn't fall out of the loop:
 	if(*(inputfile_map + cursor) != '\n')
 	{
-		printf("Input file error!\nFirst line is too long!\n");
+		printf(BOLD RED "Input file error!\nFirst line is too long!\n" RESET);
 		return -1;
 	}
 	cursor++;
@@ -91,7 +92,7 @@ int getColumnNames(char *inputfile_map, table_t *table)
 	{
 		if(*(inputfile_map + cursor) == ',')
 		{
-			printf("Input file error!\nName of column %d in table %s is blank.\n", (column +1), table->tableName);
+			printf(BOLD RED "Input file error!\nName of column %d in table %s is blank.\n" RESET, (column +1), table->tableName);
 			return 1;
 		}
 		else
@@ -114,14 +115,14 @@ int getColumnNames(char *inputfile_map, table_t *table)
 			{
 				if(table->columns[column].columnName[0] == '\0')
 				{
-					printf("Input file error!\nName of column %d in table %s is blank.\n", (column +1), table->tableName);
+					printf(BOLD RED "Input file error!\nName of column %d in table %s is blank.\n" RESET, (column +1), table->tableName);
 					return 1;
 				}
 				break;
 			}
 			if(table->columns[column].columnName[MAX_COLUMNS] != '\0')
 			{
-				printf("Input file error!\nName of column %d in table %s is too long.\n", (column + 1), table->tableName);
+				printf(BOLD RED "Input file error!\nName of column %d in table %s is too long.\n" RESET, (column + 1), table->tableName);
 				return 1;
 			}
 			cursor++;
@@ -149,7 +150,7 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 	// The primary identifier must come next:
 	if(schemaPI(schemafile_map, table, &cursor) == 1)
 	{
-		printf("Parsing error under table %s\n", table->tableName);
+		printf(BOLD RED "Parsing error under table %s\n" RESET, table->tableName);
 		return 1;
 	}
 	// Process each following line in turn:
@@ -200,7 +201,7 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 		case '#':
 			break;
 		default:
-			printf("INTERNAL EXECUTION STATE ERROR!\nSomething really bad happened in the function getTableMetadata()!\nInvalid value of switch char operator at location 0x%x!\n", (unsigned int)&op);
+			printf(BOLD MAGENTA REVERSE BLINK "INTERNAL EXECUTION STATE ERROR!\n" RED "Something really bad happened in the function getTableMetadata()!" YELLOW "\nInvalid value of switch char operator at location 0x%x!\n" RESET, (unsigned int)&op);
 			return 1;
 			break;
 		}

@@ -19,6 +19,7 @@
 #include <rdfgen/limits.h>
 #include <rdfgen/interface.h>
 #include <rdfgen/structure.h>
+#include <rdfgen/color.h>
 
 
 
@@ -27,7 +28,7 @@ int main(int argc, char *argv[])
 	// First make sure there are at least two arguments, fail otherwise:
 	if(argc < 3)
 	{
-		printf("Too few arguments!\nUsage:\nrdfgen schemafile csvfile1 csvfile2 csvfile3 ...\n");
+		printf(BOLD RED "Too few arguments!\n" RESET "Usage:\nrdfgen schemafile csvfile1 csvfile2 csvfile3 ...\n");
 		return 1;
 	}
 
@@ -56,33 +57,33 @@ int main(int argc, char *argv[])
 	// Make sure that worked:
 	if(schemafile_fd == -1)
 	{
-		printf("File I/O error!\nUnable to open schema file %s\nFATAL ERROR\n", argv[1]);
+		printf(BOLD RED "File I/O error!\nUnable to open schema file %s\n" REVERSE BLINK "FATAL ERROR\n" RESET, argv[1]);
 		return 1;
 	}
 	// Get file stats:
 	if(fstat(schemafile_fd, &schemafile_stat) == -1)
 	{
-		printf("File I/O error!\nUnable to stat schema file %s\nFATAL ERROR\n", argv[1]);
+		printf(BOLD RED "File I/O error!\nUnable to stat schema file %s\n" REVERSE "FATAL ERROR\n" RESET, argv[1]);
 		return 1;
 	}
 	// Create memory map:
 	schemafile_map = mmap(NULL, schemafile_stat.st_size, PROT_READ, MAP_PRIVATE, schemafile_fd, 0);
 	if(schemafile_map == MAP_FAILED)
 	{
-		printf("Memory map error!\nUnable to create map for schema file %s\nFATAL ERROR\n", argv[1]);
+		printf(BOLD RED "Memory map error!\nUnable to create map for schema file %s\n" REVERSE "FATAL ERROR\n" RESET, argv[1]);
 		return 1;
 	}
 	// Attempt to set page cache mode:
 	if(madvise(schemafile_map, schemafile_stat.st_size, MADV_SEQUENTIAL) == -1)
 	{
-		printf("Page cache mode set error!\nUnable to set MADV_SEQUENTIAL page cache optimization mode.\nFATAL ERROR\n");
+		printf(BOLD RED "Page cache mode set error!\nUnable to set MADV_SEQUENTIAL page cache optimization mode.\n" REVERSE "FATAL ERROR\n" RESET);
 		return 1;
 	}
 	// Allocate memory for the table metadata:
 	table_t *table = malloc(sizeof(*table));
 	if(table == NULL)
 	{
-		printf("Memory I/O error!\nUnable to allocate memory for table metadata.\nFATAL ERROR\n");
+		printf(BOLD RED "Memory I/O error!\nUnable to allocate memory for table metadata.\n" REVERSE "FATAL ERROR\n" RESET);
 		return 1;
 	}
 	// Zero out:
@@ -91,7 +92,7 @@ int main(int argc, char *argv[])
 	field_t *row_buffer = malloc(MAX_COLUMNS * sizeof(*row_buffer));
 	if(row_buffer == NULL)
 	{
-		printf("Memory I/O error!\nUnable to allocate memory for row buffer.\nFATAL ERROR\n");
+		printf(BOLD RED "Memory I/O error!\nUnable to allocate memory for row buffer.\n" REVERSE "FATAL ERROR\n" RESET);
 		return 1;
 	}
 	// Zero out:
@@ -102,7 +103,7 @@ int main(int argc, char *argv[])
 		// Get the table name from the input file name:
 		if(getTableName(argv[currentArg], outputfilename, table) == -1)
 		{
-			printf("FATAL ERROR\n");
+			printf(BOLD RED REVERSE BLINK "FATAL ERROR\n" RESET);
 			return 1;
 		}
 		// Open the input file:
@@ -110,37 +111,37 @@ int main(int argc, char *argv[])
 		// Make sure that worked:
 		if(inputfile_fd == -1)
 		{
-			printf("File I/O error!\nUnable to open input file %s\nFATAL ERROR\n", argv[currentArg]);
+			printf(BOLD RED "File I/O error!\nUnable to open input file %s\n" REVERSE BLINK "FATAL ERROR\n" RESET, argv[currentArg]);
 			return 1;
 		}
 		// Stat the file:
 		if(fstat(inputfile_fd, &inputfile_stat) == -1)
 		{
-			printf("File I/O error!\nUnable to stat input file %s\nFATAL ERROR\n", argv[currentArg]);
+			printf(BOLD RED "File I/O error!\nUnable to stat input file %s\n" REVERSE BLINK "FATAL ERROR\n" RESET, argv[currentArg]);
 			return 1;
 		}
 		// Map the memory:
 		inputfile_map = mmap(NULL, inputfile_stat.st_size, PROT_READ, MAP_PRIVATE, inputfile_fd, 0);
 		if(inputfile_map == MAP_FAILED)
 		{
-			printf("Memory map error!\nUnable to create map for input file %s\nFATAL ERROR\n", argv[currentArg]);
+			printf(BOLD RED "Memory map error!\nUnable to create map for input file %s\n" REVERSE BLINK "FATAL ERROR\n" RESET, argv[currentArg]);
 			return 1;
 		}
 		// Set page cache mode:
 		if(madvise(inputfile_map, inputfile_stat.st_size, MADV_SEQUENTIAL) == -1)
 		{
-			printf("Page cache mode set error!\nUnable to set MADV_SEQUENTIAL page cache optimization mode.\nFATAL ERROR\n");
+			printf(BOLD RED "Page cache mode set error!\nUnable to set MADV_SEQUENTIAL page cache optimization mode.\n" REVERSE BLINK "FATAL ERROR\n" RESET);
 			return 1;
 		}
 		// Check to make sure the input file has data in it:
 		if(checkEmpty(inputfile_map) == -1)
 		{
-			printf("FATAL ERROR\n");
+			printf(BOLD RED REVERSE BLINK "FATAL ERROR\n" RESET);
 			return 1;
 		}
 		else if(checkEmpty(inputfile_map) == 1)
 		{
-			printf("Input file error!\nFile %s contains no data.\nContinuing...\n", argv[currentArg]);
+			printf(BOLD RED "Input file error!\nFile %s contains no data.\n" GREEN REVERSE "Continuing...\n" RESET, argv[currentArg]);
 			char *emptyfilename = malloc(MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1 + 7);
 			strcat(emptyfilename, outputfilename);
 			strcat(emptyfilename, ".empty");
@@ -151,13 +152,13 @@ int main(int argc, char *argv[])
 			memset(table, '\0', sizeof(*table));
 			if(munmap(inputfile_map, inputfile_stat.st_size) == -1)
 			{
-				printf("Memory map error!\nUnable to unmap input file %s\nFATAL ERROR\n", argv[currentArg]);
+				printf(BOLD RED "Memory map error!\nUnable to unmap input file %s\n" REVERSE BLINK "FATAL ERROR\n" RESET, argv[currentArg]);
 				return 1;
 			}
 			memset(&inputfile_stat, '\0', sizeof(inputfile_stat));
 			if(close(inputfile_fd) == -1)
 			{
-				printf("File I/O error!\nUnable to close input file %s\nFATAL ERROR\n", argv[currentArg]);
+				printf(BOLD RED "File I/O error!\nUnable to close input file %s\n" REVERSE BLINK "FATAL ERROR\n" RESET, argv[currentArg]);
 				return 1;
 			}
 			continue;
@@ -165,20 +166,20 @@ int main(int argc, char *argv[])
 		// Get the column names:
 		if(getColumnNames(inputfile_map, table) == 1)
 		{
-			printf("FATAL ERROR\n");
+			printf(BOLD RED REVERSE BLINK "FATAL ERROR\n" RESET);
 			return 1;
 		}
 		// Get table metadata:
 		if(getTableMetadata(schemafile_map, table) == 1)
 		{
-			printf("FATAL ERROR\n");
+			printf(BOLD RED REVERSE BLINK "FATAL ERROR\n" RESET);
 			return 1;
 		}
 		// Open the output file:
 		outputfile = fopen(outputfilename,"w");
 		if(outputfile == NULL)
 		{
-			printf("File I/O error!\nUnable to open output file %s\nFATAL ERROR\n", argv[currentArg]);
+			printf(BOLD RED "File I/O error!\nUnable to open output file %s\n" REVERSE BLINK "FATAL ERROR\n" RESET, argv[currentArg]);
 			return 1;
 		}
 		// Print some table details for debugging purposes:
@@ -186,11 +187,11 @@ int main(int argc, char *argv[])
 		printf("Number of columns: %d\n", table->totalColumns);
 		if(table->primaryIdentifier == -1)
 		{
-			printf("No Primary Identifier\n");
+			printf(BOLD CYAN "No Primary Identifier\n" RESET);
 		}
 		else
 		{
-			printf("Primary Identifier: %s\n", table->columns[table->primaryIdentifier].columnName);
+			printf("Primary Identifier: " BOLD BLUE "%s\n" RESET, table->columns[table->primaryIdentifier].columnName);
 		}
 		printf("Columns:\n");
 		for(int i = 0; i < table->totalColumns; i++)
@@ -202,31 +203,31 @@ int main(int argc, char *argv[])
 				printf("%-6s","real");
 				break;
 			case req:
-				printf("%-6s","req");
+				printf(BOLD RED "%-6s" RESET,"req");
 				break;
 			case virt:
-				printf("%-6s","virt");
+				printf(BOLD MAGENTA "%-6s" RESET,"virt");
 				break;
 			default:
-				printf("%-6s","!!!!");
+				printf(BOLD RED REVERSE BLINK "%-6s" RESET,"!!!!");
 				break;
 			}
 			switch(table->columns[i].FKtarget[0])
 			{
 			case '\0':
-				printf("%-36s","Independent");
+				printf(BOLD GREEN "%-36s" RESET,"Independent");
 				break;
 			default:
-				printf("->%-34s",table->columns[i].FKtarget);
+				printf(BOLD YELLOW "->%-34s" RESET,table->columns[i].FKtarget);
 				break;
 			}
 			switch(table->columns[i].defaultValue.data[0])
 			{
 			case '\0':
-				printf("no default value");
+				printf(BOLD GREEN "No default value" RESET);
 				break;
 			default:
-				printf("default value: %s", table->columns[i].defaultValue.data);
+				printf(BOLD MAGENTA "default value: %s" RESET, table->columns[i].defaultValue.data);
 				break;
 			}
 			printf("\n");
@@ -238,19 +239,19 @@ int main(int argc, char *argv[])
 		printf("Generating triples...\n");
 		outputTriples(outputfile, inputfile_map, table, row_buffer);
 		// Clean up after this iteration:
-		printf("Finished %s.\n",outputfilename);
+		printf(BOLD GREEN "Finished %s\n" RESET,outputfilename);
 		fclose(outputfile);
 		memset(outputfilename, '\0', MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1);
 		memset(table, '\0', sizeof(*table));
 		if(munmap(inputfile_map, inputfile_stat.st_size) == -1)
 		{
-			printf("Memory map error!\nUnable to unmap input file %s\nFATAL ERROR\n",argv[currentArg]);
+			printf(BOLD RED "Memory map error!\nUnable to unmap input file %s\n" REVERSE BLINK "FATAL ERROR\n" RESET,argv[currentArg]);
 			return 1;
 		}
 		memset(&inputfile_stat, '\0', sizeof(inputfile_stat));
 		if(close(inputfile_fd) == -1)
 		{
-			printf("File I/O error!\nUnable to close input file%s\nFATAL ERROR\n", argv[currentArg]);
+			printf(BOLD RED "File I/O error!\nUnable to close input file%s\n" REVERSE BLINK "FATAL ERROR\n" RESET, argv[currentArg]);
 			return 1;
 		}
 	}
