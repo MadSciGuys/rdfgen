@@ -25,6 +25,8 @@
 
 int main(int argc, char *argv[])
 {
+	//Terminal buffering is annoying; turn it off:
+	setbuf(stdout,NULL);
 	// First make sure there are at least two arguments, fail otherwise:
 	if(argc < 3)
 	{
