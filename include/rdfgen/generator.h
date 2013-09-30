@@ -13,13 +13,13 @@
 #define DOCTYPE "<!DOCTYPE rdf:RDF [<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\">]>"
 
 // RDF namespace string:
-#define RDF_NAMESPACES "<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://www.jnj.com/DWH/DWH\"\n  xmlns:DWH=\"http://www.jnj.com/DWH/schema#\">"
+#define RDF_NAMESPACES "<rdf:RDF\n  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n  xml:base=\"http://rndusraabcdd2.rndus.na.jnj.com/ODS/ODS\"\n  xmlns:ODS=\"\http://rndusraabcdd2.rndus.na.jnj.com/ODS/schema#\">"
 
 // RDF NS prefix:
-#define PREFIX "DWH"
+#define PREFIX "ODS"
 
 // RDF base:
-#define BASE "http://www.jnj.com/DWH/DWH"
+#define BASE "http://rndusraabcdd2.rndus.na.jnj.com/ODS/ODS"
 
 #include <rdfgen/interface.h>
 
