@@ -16,9 +16,9 @@
 
 // This function seeks to the target table in the schema file, leaving the
 // cursor on the tab after the newline. Return 1 upon error, 0 otherwise:
-int schemaSeek(char *schemafile_map, char *tableName, int *cursor)
+int schemaSeek(char *schemafile_map, char *tableName, unsigned int *cursor)
 {
-	int _cursor = 0; // Cursor for use in this scope.
+	unsigned int _cursor = 0; // Cursor for use in this scope.
 	while(*(schemafile_map + _cursor) != '\0')
 	{
 		// Skip any lines that are comments or part of another table's spec:
@@ -83,7 +83,7 @@ int schemaSeek(char *schemafile_map, char *tableName, int *cursor)
 
 // This function gets the primary key identifier. Cursor should be on the tab
 // at the beginning of the line. Return 1 on error, 0 otherwise:
-int schemaPI(char *schemafile_map, table_t *table, int *cursor)
+int schemaPI(char *schemafile_map, table_t *table, unsigned int *cursor)
 {
 	int _cursor = *cursor;
 	char PIname[MAX_COLUMN_NAME_LEN + 1];
@@ -201,9 +201,9 @@ int schemaPI(char *schemafile_map, table_t *table, int *cursor)
 // This function fetches the operator and arguments from one line of the schema
 // file. Cursor should be on the tab preceeding the declaration. Return 1 on
 // error, return 0 otherwise.
-int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, int *cursor)
+int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsigned int *cursor)
 {
-	int _cursor = *cursor;
+	unsigned int _cursor = *cursor;
 	if(*(schemafile_map + _cursor) != '\t')
 	{
 		if(*(schemafile_map + _cursor) == '#' || *(schemafile_map + _cursor) == '\0')

@@ -22,12 +22,12 @@
 #define MAX_FILE_NAME_LEN 256
 
 // Define the max lengths of table names and column names:
-#define MAX_TABLE_NAME_LEN 32
-#define MAX_COLUMN_NAME_LEN 32
+#define MAX_TABLE_NAME_LEN 30
+#define MAX_COLUMN_NAME_LEN 30
 
 // Define the max number of columns and max length of data fields:
-#define MAX_COLUMNS 1024
-#define MAX_FIELD_LEN 32768
+#define MAX_COLUMNS 1000
+#define MAX_FIELD_LEN 20000
 
 // Define the flags used with the open() system call:
 #define O_READ_FLAGS O_RDONLY

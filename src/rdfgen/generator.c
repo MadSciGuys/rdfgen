@@ -56,14 +56,14 @@ int checkReq(table_t *table)
 
 // This function reads one row of a CSV file into a buffer. Return 1 if EOF is
 // found, 0 otherwise. Undefined behavior if a cell if bigger than MAX_FIELD_LEN!
-int readRow(char *inputfile_map, int *cursor, field_t *row_buffer)
+int readRow(char *inputfile_map, unsigned int *cursor, field_t *row_buffer)
 {
 	if(*(inputfile_map + *cursor) == '\0')
 	{
 		return 1;
 	}
-	int cell = 0;
-	int _cursor = 0;
+	unsigned int cell = 0;
+	unsigned int _cursor = 0;
 	for(unsigned int i = *cursor; i < (((MAX_FIELD_LEN + 1) * MAX_COLUMNS) + *cursor); i++)
 	{
 		if(*(inputfile_map + i) == '\n')
@@ -95,7 +95,7 @@ int readRow(char *inputfile_map, int *cursor, field_t *row_buffer)
 }
 
 // This function generates triples for an anonymous leaf table.
-void genTriples_anon_leaf(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_leaf(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -137,7 +137,7 @@ void genTriples_anon_leaf(char *inputfile_map, int *cursor, FILE *outputfile, fi
 }
 
 // This function generates triples for an anonymous table.
-void genTriples_anon(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -203,7 +203,7 @@ void genTriples_anon(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 }
 
 // This function generates triples for a leaf table.
-void genTriples_leaf(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_leaf(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -255,7 +255,7 @@ void genTriples_leaf(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 }
 
 // This function generates triples for a table whose PI is independent.
-void genTriples(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -331,7 +331,7 @@ void genTriples(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row
 }
 
 // This function generates triples for a table whose PI is an FK.
-void genTriples_pifk(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_pifk(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -414,7 +414,7 @@ void genTriples_pifk(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 
 
 // This function generates triples for an anonymous leaf table.
-void genTriples_anon_leaf_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -451,7 +451,7 @@ void genTriples_anon_leaf_no_virt(char *inputfile_map, int *cursor, FILE *output
 }
 
 // This function generates triples for an anonymous table.
-void genTriples_anon_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_no_virt(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -504,7 +504,7 @@ void genTriples_anon_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 }
 
 // This function generates triples for a leaf table.
-void genTriples_leaf_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_leaf_no_virt(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -551,7 +551,7 @@ void genTriples_leaf_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 }
 
 // This function generates triples for a table whose PI is independent.
-void genTriples_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_no_virt(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -614,7 +614,7 @@ void genTriples_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, fiel
 }
 
 // This function generates triples for a table whose PI is an FK.
-void genTriples_pifk_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_pifk_no_virt(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -686,7 +686,7 @@ void genTriples_pifk_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 
 
 // This function generates triples for an anonymous leaf table.
-void genTriples_anon_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_leaf_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -714,7 +714,7 @@ void genTriples_anon_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputf
 }
 
 // This function generates triples for an anonymous table.
-void genTriples_anon_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -758,7 +758,7 @@ void genTriples_anon_no_req(char *inputfile_map, int *cursor, FILE *outputfile, 
 }
 
 // This function generates triples for a leaf table.
-void genTriples_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_leaf_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -796,7 +796,7 @@ void genTriples_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputfile, 
 }
 
 // This function generates triples for a table whose PI is independent.
-void genTriples_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -850,7 +850,7 @@ void genTriples_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field
 }
 
 // This function generates triples for a table whose PI is an FK.
-void genTriples_pifk_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_pifk_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -911,7 +911,7 @@ void genTriples_pifk_no_req(char *inputfile_map, int *cursor, FILE *outputfile, 
 
 
 // This function generates triples for an anonymous leaf table.
-void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -934,7 +934,7 @@ void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE 
 }
 
 // This function generates triples for an anonymous table.
-void genTriples_anon_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_no_virt_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -965,7 +965,7 @@ void genTriples_anon_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outp
 }
 
 // This function generates triples for a leaf table.
-void genTriples_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_leaf_no_virt_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -998,7 +998,7 @@ void genTriples_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outp
 }
 
 // This function generates triples for a table whose PI is independent.
-void genTriples_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_no_virt_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -1039,7 +1039,7 @@ void genTriples_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfil
 }
 
 // This function generates triples for a table whose PI is an FK.
-void genTriples_pifk_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_pifk_no_virt_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{

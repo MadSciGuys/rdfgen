@@ -28,34 +28,34 @@
 int checkLeaf(table_t *table);
 int checkVirt(table_t *table);
 int checkReq(table_t *table);
-int readRow(char *inputfile_map, int *cursor, field_t *row_buffer);
+int readRow(char *inputfile_map, unsigned int *cursor, field_t *row_buffer);
 
 // No-assumption generator functions:
-void genTriples(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_pifk(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_anon(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_anon_leaf(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_leaf(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_pifk(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon_leaf(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_leaf(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
 
 // Generator functions assuming no required columns:
-void genTriples_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_pifk_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_anon_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_anon_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_pifk_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon_leaf_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_leaf_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
 
 // Generator functions assuming no virtual columns:
-void genTriples_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_pifk_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_anon_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_anon_leaf_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_leaf_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_no_virt(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_pifk_no_virt(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon_no_virt(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_leaf_no_virt(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
 
 // Generator functions assuming no virtual columns and no required columns:
-void genTriples_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_pifk_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_anon_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
-void genTriples_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_no_virt_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_pifk_no_virt_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon_no_virt_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
+void genTriples_leaf_no_virt_no_req(char *inputfile_map, unsigned int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table);
 
 #endif
