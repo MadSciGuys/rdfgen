@@ -24,18 +24,18 @@ typedef enum
 typedef struct
 {
 	column_type_t type;
+	field_t defaultValue;
 	char columnName[MAX_COLUMN_NAME_LEN + 1];
 	char FKtarget[MAX_TABLE_NAME_LEN + 1];
-	field_t defaultValue;
 } column_t;
 
 // Define structure to hold table-specific information:
 typedef struct
 {
-	char tableName[MAX_TABLE_NAME_LEN + 1];
-	int totalColumns;
 	column_t columns[MAX_COLUMNS];
+	int totalColumns;
 	int primaryIdentifier;
+	char tableName[MAX_TABLE_NAME_LEN + 1];
 } table_t;
 
 #endif
