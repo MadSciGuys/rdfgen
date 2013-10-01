@@ -133,7 +133,6 @@ void genTriples_anon_leaf(char *inputfile_map, int *cursor, FILE *outputfile, fi
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -200,7 +199,6 @@ void genTriples_anon(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -212,7 +210,6 @@ void genTriples_leaf(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -254,7 +251,6 @@ void genTriples_leaf(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -266,7 +262,6 @@ void genTriples(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -332,7 +327,6 @@ void genTriples(char *inputfile_map, int *cursor, FILE *outputfile, field_t *row
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -344,7 +338,6 @@ void genTriples_pifk(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -413,7 +406,6 @@ void genTriples_pifk(char *inputfile_map, int *cursor, FILE *outputfile, field_t
 		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -455,7 +447,6 @@ void genTriples_anon_leaf_no_virt(char *inputfile_map, int *cursor, FILE *output
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -509,7 +500,6 @@ void genTriples_anon_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -521,7 +511,6 @@ void genTriples_leaf_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -558,7 +547,6 @@ void genTriples_leaf_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -570,7 +558,6 @@ void genTriples_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, fiel
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -623,7 +610,6 @@ void genTriples_no_virt(char *inputfile_map, int *cursor, FILE *outputfile, fiel
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -635,7 +621,6 @@ void genTriples_pifk_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -691,7 +676,6 @@ void genTriples_pifk_no_virt(char *inputfile_map, int *cursor, FILE *outputfile,
 		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -726,7 +710,6 @@ void genTriples_anon_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputf
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -771,7 +754,6 @@ void genTriples_anon_no_req(char *inputfile_map, int *cursor, FILE *outputfile, 
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -783,7 +765,6 @@ void genTriples_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputfile, 
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -811,7 +792,6 @@ void genTriples_leaf_no_req(char *inputfile_map, int *cursor, FILE *outputfile, 
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -823,7 +803,6 @@ void genTriples_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -867,7 +846,6 @@ void genTriples_no_req(char *inputfile_map, int *cursor, FILE *outputfile, field
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -879,7 +857,6 @@ void genTriples_pifk_no_req(char *inputfile_map, int *cursor, FILE *outputfile, 
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -926,7 +903,6 @@ void genTriples_pifk_no_req(char *inputfile_map, int *cursor, FILE *outputfile, 
 		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -954,7 +930,6 @@ void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE 
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -986,7 +961,6 @@ void genTriples_anon_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outp
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -998,7 +972,6 @@ void genTriples_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outp
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -1021,7 +994,6 @@ void genTriples_leaf_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outp
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -1033,7 +1005,6 @@ void genTriples_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfil
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -1064,7 +1035,6 @@ void genTriples_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outputfil
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
 
@@ -1076,7 +1046,6 @@ void genTriples_pifk_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outp
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-			memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -1110,6 +1079,5 @@ void genTriples_pifk_no_virt_no_req(char *inputfile_map, int *cursor, FILE *outp
 		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
-		memset(row_buffer, '\0', MAX_COLUMNS * sizeof(*row_buffer));
 	}
 }
