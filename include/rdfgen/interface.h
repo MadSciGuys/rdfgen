@@ -7,6 +7,7 @@
 #include <rdfgen/structure.h>
 
 
+
 // Functions used in main() to interface with the modules:
 int getTableName(char *inputfilename, char *outputfilename, table_t *table);
 int checkEmpty(char *inputfile_map);
