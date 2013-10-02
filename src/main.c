@@ -97,6 +97,8 @@ int main(int argc, char *argv[])
 	}
 	// Zero out:
 	memset(row_buffer, '\0', sizeof(*row_buffer) * MAX_COLUMNS);
+	// Keep track of the total number of triples generated(includes implied triples):
+	unsigned long int triples = 0;
 	// Ready for the main loop. We're going to iterate over the remaining arguments:
 	for(int currentArg = 2; currentArg < argc; currentArg++)
 	{
@@ -161,6 +163,7 @@ int main(int argc, char *argv[])
 				printf(BOLD RED "File I/O error!\nUnable to close input file %s\n" REVERSE BLINK "FATAL ERROR\n" RESET, argv[currentArg]);
 				return 1;
 			}
+			triples = 0;
 			continue;
 		}
 		// Get the column names:
@@ -234,12 +237,12 @@ int main(int argc, char *argv[])
 		}
 		// Output the RDF header:
 		printf("Writing header...\n");
-		outputHeader(outputfile, table);
+		outputHeader(outputfile, table, &triples);
 		// Output the RDF triples:
 		printf("Generating triples...\n");
-		outputTriples(outputfile, inputfile_map, table, row_buffer);
+		outputTriples(outputfile, inputfile_map, table, row_buffer, &triples);
 		// Clean up after this iteration:
-		printf(BOLD GREEN "Finished %s\n" RESET,outputfilename);
+		printf(BOLD GREEN "Finished %s, " BLUE "%lu" GREEN " total triples.\n" RESET,outputfilename, triples);
 		fclose(outputfile);
 		memset(outputfilename, '\0', MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1);
 		memset(table, '\0', sizeof(*table));
@@ -254,6 +257,7 @@ int main(int argc, char *argv[])
 			printf(BOLD RED "File I/O error!\nUnable to close input file%s\n" REVERSE BLINK "FATAL ERROR\n" RESET, argv[currentArg]);
 			return 1;
 		}
+		triples = 0;
 	}
 	return 0;
 }

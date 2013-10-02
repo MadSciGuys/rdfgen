@@ -95,22 +95,25 @@ int readRow(char *inputfile_map, unsigned long int *cursor, field_t *row_buffer)
 }
 
 // This function generates triples for an anonymous leaf table.
-void genTriples_anon_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
 		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		(*triples) += 2;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is column virtual?
 			if(table->columns[i].type == virt)
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, must it?
 			else if(table->columns[i].type == req)
@@ -119,6 +122,7 @@ void genTriples_anon_leaf(char *inputfile_map, unsigned long int *cursor, FILE *
 				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 				// If not, warn the user.
 				else
@@ -130,6 +134,7 @@ void genTriples_anon_leaf(char *inputfile_map, unsigned long int *cursor, FILE *
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -137,11 +142,12 @@ void genTriples_anon_leaf(char *inputfile_map, unsigned long int *cursor, FILE *
 }
 
 // This function generates triples for an anonymous table.
-void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
 		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		(*triples) += 2;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is column virtual?
@@ -151,10 +157,12 @@ void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, does it have a value?
@@ -164,10 +172,12 @@ void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, must it?
@@ -180,10 +190,12 @@ void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
 						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						(*triples)++;
 					}
 					else
 					{
 						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+						(*triples)++;
 					}
 				}
 				// If not, warn the user.
@@ -196,6 +208,7 @@ void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -203,7 +216,7 @@ void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 }
 
 // This function generates triples for a leaf table.
-void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -213,6 +226,7 @@ void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -224,11 +238,13 @@ void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 			else if(table->columns[i].type == virt)
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, must it?
 			else if(table->columns[i].type == req)
@@ -237,6 +253,7 @@ void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 				// If not, warn the user.
 				else
@@ -248,6 +265,7 @@ void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -255,7 +273,7 @@ void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 }
 
 // This function generates triples for a table whose PI is independent.
-void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -265,6 +283,7 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -279,10 +298,13 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
+
 				}
 			}
 			// If not, does it have a value?
@@ -292,10 +314,12 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, must it?
@@ -308,10 +332,12 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
 						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						(*triples)++;
 					}
 					else
 					{
 						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+						(*triples)++;
 					}
 				}
 				// If not, warn the user.
@@ -324,6 +350,7 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -331,7 +358,7 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 }
 
 // This function generates triples for a table whose PI is an FK.
-void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -341,6 +368,7 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -355,10 +383,12 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, does it have a value?
@@ -368,10 +398,12 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, must it?
@@ -384,10 +416,12 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
 						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						(*triples)++;
 					}
 					else
 					{
 						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+						(*triples)++;
 					}
 				}
 				// If not, warn the user.
@@ -400,11 +434,13 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
 		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples) += 2;
 		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
 	}
 }
@@ -414,17 +450,19 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 
 
 // This function generates triples for an anonymous leaf table.
-void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
 		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		(*triples) += 2;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Does it have a value?
 			if((row_buffer + i)->data[0] != '\0')
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, must it?
 			else if(table->columns[i].type == req)
@@ -433,6 +471,7 @@ void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned long int *cursor
 				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 				// If not, warn the user.
 				else
@@ -444,6 +483,7 @@ void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned long int *cursor
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -451,11 +491,12 @@ void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned long int *cursor
 }
 
 // This function generates triples for an anonymous table.
-void genTriples_anon_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
 		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		(*triples) += 2;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Does it have a value?
@@ -465,10 +506,12 @@ void genTriples_anon_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, must it?
@@ -481,10 +524,12 @@ void genTriples_anon_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
 						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						(*triples)++;
 					}
 					else
 					{
 						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+						(*triples)++;
 					}
 				}
 				// If not, warn the user.
@@ -497,6 +542,7 @@ void genTriples_anon_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -504,7 +550,7 @@ void genTriples_anon_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 }
 
 // This function generates triples for a leaf table.
-void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -514,6 +560,7 @@ void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -525,6 +572,7 @@ void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 			else if((row_buffer + i)->data[0] != '\0')
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, must it?
 			else if(table->columns[i].type == req)
@@ -533,6 +581,7 @@ void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 				// If not, warn the user.
 				else
@@ -544,6 +593,7 @@ void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -551,7 +601,7 @@ void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 }
 
 // This function generates triples for a table whose PI is independent.
-void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -561,6 +611,7 @@ void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *ou
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -575,10 +626,12 @@ void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *ou
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, must it?
@@ -591,10 +644,12 @@ void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *ou
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
 						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						(*triples)++;
 					}
 					else
 					{
 						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+						(*triples)++;
 					}
 				}
 				// If not, warn the user.
@@ -607,6 +662,7 @@ void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *ou
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -614,7 +670,7 @@ void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *ou
 }
 
 // This function generates triples for a table whose PI is an FK.
-void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -624,6 +680,7 @@ void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -638,10 +695,12 @@ void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, must it?
@@ -654,10 +713,12 @@ void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
 						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						(*triples)++;
 					}
 					else
 					{
 						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+						(*triples)++;
 					}
 				}
 				// If not, warn the user.
@@ -670,11 +731,13 @@ void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
 		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples) += 2;
 		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
 	}
 }
@@ -686,27 +749,31 @@ void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 
 
 // This function generates triples for an anonymous leaf table.
-void genTriples_anon_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
 		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		(*triples) += 2;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is column virtual?
 			if(table->columns[i].type == virt)
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, write nil:
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -714,11 +781,12 @@ void genTriples_anon_leaf_no_req(char *inputfile_map, unsigned long int *cursor,
 }
 
 // This function generates triples for an anonymous table.
-void genTriples_anon_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
 		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		(*triples) += 2;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is column virtual?
@@ -728,10 +796,12 @@ void genTriples_anon_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, does it have a value?
@@ -741,16 +811,19 @@ void genTriples_anon_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -758,7 +831,7 @@ void genTriples_anon_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 }
 
 // This function generates triples for a leaf table.
-void genTriples_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -768,6 +841,7 @@ void genTriples_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -779,16 +853,19 @@ void genTriples_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 			else if(table->columns[i].type == virt)
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, write nil:
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -796,7 +873,7 @@ void genTriples_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 }
 
 // This function generates triples for a table whose PI is independent.
-void genTriples_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -806,6 +883,7 @@ void genTriples_no_req(char *inputfile_map, unsigned long int *cursor, FILE *out
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -820,10 +898,12 @@ void genTriples_no_req(char *inputfile_map, unsigned long int *cursor, FILE *out
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, does it have a value?
@@ -833,16 +913,19 @@ void genTriples_no_req(char *inputfile_map, unsigned long int *cursor, FILE *out
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -850,7 +933,7 @@ void genTriples_no_req(char *inputfile_map, unsigned long int *cursor, FILE *out
 }
 
 // This function generates triples for a table whose PI is an FK.
-void genTriples_pifk_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_pifk_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -860,6 +943,7 @@ void genTriples_pifk_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -874,10 +958,12 @@ void genTriples_pifk_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, does it have a value?
@@ -887,21 +973,25 @@ void genTriples_pifk_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
 		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples) += 2;
 		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
 	}
 }
@@ -911,22 +1001,25 @@ void genTriples_pifk_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 
 
 // This function generates triples for an anonymous leaf table.
-void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
 		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		(*triples) += 2;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Does it have a value?
 			if((row_buffer + i)->data[0] != '\0')
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, write nil:
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -934,11 +1027,12 @@ void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, unsigned long int 
 }
 
 // This function generates triples for an anonymous table.
-void genTriples_anon_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_anon_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
 		fprintf(outputfile,"<%s:%s>\n", PREFIX, table->tableName);
+		(*triples) += 2;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Does it have a value?
@@ -948,16 +1042,19 @@ void genTriples_anon_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -965,7 +1062,7 @@ void genTriples_anon_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 }
 
 // This function generates triples for a leaf table.
-void genTriples_leaf_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_leaf_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -975,6 +1072,7 @@ void genTriples_leaf_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -986,11 +1084,13 @@ void genTriples_leaf_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 			else if((row_buffer + i)->data[0] != '\0')
 			{
 				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples)++;
 			}
 			// If not, write nil:
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -998,7 +1098,7 @@ void genTriples_leaf_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 }
 
 // This function generates triples for a table whose PI is independent.
-void genTriples_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -1008,6 +1108,7 @@ void genTriples_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, F
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -1022,16 +1123,19 @@ void genTriples_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, F
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
@@ -1039,7 +1143,7 @@ void genTriples_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, F
 }
 
 // This function generates triples for a table whose PI is an FK.
-void genTriples_pifk_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table)
+void genTriples_pifk_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
 {
 	while(readRow(inputfile_map, cursor, row_buffer) != 1)
 	{
@@ -1049,6 +1153,7 @@ void genTriples_pifk_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples)++;
 		for(int i = 0; i < table->totalColumns; i++)
 		{
 			// Is this the PI?
@@ -1063,21 +1168,25 @@ void genTriples_pifk_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
 					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					(*triples)++;
 				}
 				else
 				{
 					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
+					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
 				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
+				(*triples) += 2;
 			}
 		}
 		fprintf(outputfile, "</%s:%s>\n", PREFIX, table->tableName);
 		fprintf(outputfile, "<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget, table->columns[table->primaryIdentifier].FKtarget, (row_buffer + (table->primaryIdentifier))->data);
 		fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, BASE, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
+		(*triples) += 2;
 		fprintf(outputfile, "</%s:%s>\n\n", PREFIX, table->columns[table->primaryIdentifier].FKtarget);
 	}
 }

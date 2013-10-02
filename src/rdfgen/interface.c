@@ -211,7 +211,7 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 
 // This function outputs the RDF header. If we've gotten this far, the only
 // possible errors will occur at the kernel level, or so we hope...
-void outputHeader(FILE *outputfile, table_t *table)
+void outputHeader(FILE *outputfile, table_t *table, unsigned long int *triples)
 {
 	fprintf(outputfile, XML_VERSION);
 	fprintf(outputfile, "\n");
@@ -221,6 +221,7 @@ void outputHeader(FILE *outputfile, table_t *table)
 	fprintf(outputfile, "\n\n");
 
 	fprintf(outputfile, "<rdfs:Class rdf:ID=\"%s\"/>\n\n", table->tableName);
+	(*triples)++;
 
 	for(int i = 0; i < table->totalColumns; i++)
 	{
@@ -235,6 +236,7 @@ void outputHeader(FILE *outputfile, table_t *table)
 			else
 			{
 				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n", table->tableName, table->columns[i].columnName, table->columns[i].FKtarget, table->tableName);
+				(*triples) += 3;
 			}
 		}
 		else
@@ -242,10 +244,12 @@ void outputHeader(FILE *outputfile, table_t *table)
 			if(table->columns[i].FKtarget[0] == '\0')
 			{
 				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"%s\"/>\n</rdf:Property>\n\n", table->tableName, table->columns[i].columnName, table->tableName);
+				(*triples) += 2;
 			}
 			else
 			{
 				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n", table->tableName, table->columns[i].columnName, table->tableName, table->columns[i].FKtarget);
+				(*triples) += 3;
 			}
 		}
 	}
@@ -253,7 +257,7 @@ void outputHeader(FILE *outputfile, table_t *table)
 }
 
 // This function outputs the RDF triples. There should be no userspace errors...
-void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_t *row_buffer)
+void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_t *row_buffer, unsigned long int *triples)
 {
 	unsigned long int cursor;
 	bool leaf;
@@ -275,30 +279,30 @@ void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_
 				if(checkLeaf(table) == 1)
 				{
 					printf("Using genTriples_anon_leaf_no_virt()\n");
-					genTriples_anon_leaf_no_virt(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_anon_leaf_no_virt(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 				else
 				{
 					printf("Using genTriples_anon_no_virt()\n");
-					genTriples_anon_no_virt(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_anon_no_virt(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 			}
 			else if(table->columns[table->primaryIdentifier].FKtarget[0] != '\0')
 			{
 				printf("Using genTriples_pifk_no_virt()\n");
-				genTriples_pifk_no_virt(inputfile_map, &cursor, outputfile, row_buffer, table);
+				genTriples_pifk_no_virt(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 			}
 			else
 			{
 				if(checkLeaf(table) == 1)
 				{
 					printf("Using genTriples_leaf_no_virt()\n");
-					genTriples_leaf_no_virt(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_leaf_no_virt(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 				else
 				{
 					printf("Using genTriples_no_virt()\n");
-					genTriples_no_virt(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_no_virt(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 			}
 		}
@@ -309,30 +313,30 @@ void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_
 				if(checkLeaf(table) == 1)
 				{
 					printf("Using genTriples_anon_leaf_no_virt_no_req()\n");
-					genTriples_anon_leaf_no_virt_no_req(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_anon_leaf_no_virt_no_req(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 				else
 				{
 					printf("Using genTriples_anon_no_virt_no_req()\n");
-					genTriples_anon_no_virt_no_req(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_anon_no_virt_no_req(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 			}
 			else if(table->columns[table->primaryIdentifier].FKtarget[0] != '\0')
 			{
 				printf("Using genTriples_pifk_no_virt_no_req()\n");
-				genTriples_pifk_no_virt_no_req(inputfile_map, &cursor, outputfile, row_buffer, table);
+				genTriples_pifk_no_virt_no_req(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 			}
 			else
 			{
 				if(checkLeaf(table) == 1)
 				{
 					printf("Using genTriples_leaf_no_virt_no_req()\n");
-					genTriples_leaf_no_virt_no_req(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_leaf_no_virt_no_req(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 				else
 				{
 					printf("Using genTriples_no_virt_no_req()\n");
-					genTriples_no_virt_no_req(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_no_virt_no_req(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 			}
 		}
@@ -346,30 +350,30 @@ void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_
 				if(checkLeaf(table) == 1)
 				{
 					printf("Using genTriples_anon_leaf()\n");
-					genTriples_anon_leaf(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_anon_leaf(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 				else
 				{
 					printf("Using genTriples_anon()\n");
-					genTriples_anon(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_anon(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 			}
 			else if(table->columns[table->primaryIdentifier].FKtarget[0] != '\0')
 			{
 				printf("Using genTriples_pifk()\n");
-				genTriples_pifk(inputfile_map, &cursor, outputfile, row_buffer, table);
+				genTriples_pifk(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 			}
 			else
 			{
 				if(checkLeaf(table) == 1)
 				{
 					printf("Using genTriples_leaf()\n");
-					genTriples_leaf(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_leaf(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 				else
 				{
 					printf("Using genTriples()\n");
-					genTriples(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 			}
 		}
@@ -380,30 +384,30 @@ void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_
 				if(checkLeaf(table) == 1)
 				{
 					printf("Using genTriples_anon_leaf_no_req()\n");
-					genTriples_anon_leaf_no_req(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_anon_leaf_no_req(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 				else
 				{
 					printf("Using genTriples_anon_no_req()\n");
-					genTriples_anon_no_req(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_anon_no_req(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 			}
 			else if(table->columns[table->primaryIdentifier].FKtarget[0] != '\0')
 			{
 				printf("Using genTriples_pifk_no_req()\n");
-				genTriples_pifk_no_req(inputfile_map, &cursor, outputfile, row_buffer, table);
+				genTriples_pifk_no_req(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 			}
 			else
 			{
 				if(checkLeaf(table) == 1)
 				{
 					printf("Using genTriples_leaf_no_req()\n");
-					genTriples_leaf_no_req(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_leaf_no_req(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 				else
 				{
 					printf("Using genTriples_no_req()\n");
-					genTriples_no_req(inputfile_map, &cursor, outputfile, row_buffer, table);
+					genTriples_no_req(inputfile_map, &cursor, outputfile, row_buffer, table, triples);
 				}
 			}
 		}
