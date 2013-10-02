@@ -16,6 +16,9 @@
 // Kernel level disk IO:
 #include <fcntl.h>
 
+//Timekeeping:
+#include <time.h>
+
 #include <rdfgen/limits.h>
 #include <rdfgen/interface.h>
 #include <rdfgen/structure.h>
@@ -99,6 +102,13 @@ int main(int argc, char *argv[])
 	memset(row_buffer, '\0', sizeof(*row_buffer) * MAX_COLUMNS);
 	// Keep track of the total number of triples generated(includes implied triples):
 	unsigned long int triples = 0;
+	//Keep track of generation start and end times:
+	unsigned long int start_time;
+	unsigned long int end_time;
+	struct timespec start_time_spec;
+	struct timespec end_time_spec;
+	long double total_time;
+	long double triples_per_sec;
 	// Ready for the main loop. We're going to iterate over the remaining arguments:
 	for(int currentArg = 2; currentArg < argc; currentArg++)
 	{
@@ -240,9 +250,15 @@ int main(int argc, char *argv[])
 		outputHeader(outputfile, table, &triples);
 		// Output the RDF triples:
 		printf("Generating triples...\n");
+		clock_gettime(CLOCK_MONOTONIC, &start_time_spec);
 		outputTriples(outputfile, inputfile_map, table, row_buffer, &triples);
+		clock_gettime(CLOCK_MONOTONIC, &end_time_spec);
+		start_time = (start_time_spec.tv_sec * 1000000) + (start_time_spec.tv_nsec/1000);
+		end_time = (end_time_spec.tv_sec * 1000000) + (end_time_spec.tv_nsec/1000);
+		total_time = (end_time - start_time)/1000000.0;
+		triples_per_sec = triples / total_time;
 		// Clean up after this iteration:
-		printf(BOLD GREEN "Finished %s, " BLUE "%lu" GREEN " total triples.\n" RESET,outputfilename, triples);
+		printf(BOLD GREEN "Finished %s, " BLUE "%lu" GREEN " total triples, " BLUE "%Lf" GREEN " seconds, " BLUE "%Lf" GREEN " triples/second.\n" RESET,outputfilename, triples, total_time, triples_per_sec);
 		fclose(outputfile);
 		memset(outputfilename, '\0', MAX_TABLE_NAME_LEN + RDF_EXT_LEN + 1);
 		memset(table, '\0', sizeof(*table));
@@ -258,6 +274,10 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 		triples = 0;
+		start_time = 0;
+		end_time = 0;
+		memset(&start_time_spec,'\0',sizeof(start_time_spec));
+		memset(&end_time_spec,'\0',sizeof(end_time_spec));
 	}
 	return 0;
 }
