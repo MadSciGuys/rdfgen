@@ -59,7 +59,7 @@ int getTableName(char *inputfilename, char *outputfilename, table_t *table)
 // the file is not empty, return 1 if it is, return -1 on fatal error.
 int checkEmpty(char *inputfile_map)
 {
-	unsigned int cursor;
+	unsigned long int cursor;
 	// First seek to the end of the first line:
 	for(cursor = 0; cursor < ((MAX_COLUMN_NAME_LEN + 1) * MAX_COLUMNS); cursor++)
 	{
@@ -86,7 +86,7 @@ int checkEmpty(char *inputfile_map)
 // file and populates the table metadata. Returns 1 on error, 0 on success.
 int getColumnNames(char *inputfile_map, table_t *table)
 {
-	unsigned int cursor = 0;
+	unsigned long int cursor = 0;
 	int column;
 	for(column = 0; column < MAX_COLUMNS; column++)
 	{
@@ -137,7 +137,7 @@ int getColumnNames(char *inputfile_map, table_t *table)
 // error, relying on other functions to report the specific error:
 int getTableMetadata(char *schemafile_map, table_t *table)
 {
-	unsigned int cursor = 0; // Keep track of our place between function calls.
+	unsigned long int cursor = 0; // Keep track of our place between function calls.
 	char op; // Keep track of the operator for this line.
 	char arg1[MAX_COLUMN_NAME_LEN + 1]; // First argument is always a column name.
 	char arg2[MAX_FIELD_LEN + 1]; // Second argument may be a column name or default field value.
@@ -255,7 +255,7 @@ void outputHeader(FILE *outputfile, table_t *table)
 // This function outputs the RDF triples. There should be no userspace errors...
 void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_t *row_buffer)
 {
-	unsigned int cursor;
+	unsigned long int cursor;
 	bool leaf;
 	// Seek to the beginning of the first data line:
 	for(cursor = 0; cursor < ((MAX_COLUMN_NAME_LEN + 1) * MAX_COLUMNS); cursor++)

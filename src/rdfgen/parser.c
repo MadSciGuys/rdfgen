@@ -16,9 +16,9 @@
 
 // This function seeks to the target table in the schema file, leaving the
 // cursor on the tab after the newline. Return 1 upon error, 0 otherwise:
-int schemaSeek(char *schemafile_map, char *tableName, unsigned int *cursor)
+int schemaSeek(char *schemafile_map, char *tableName, unsigned long int *cursor)
 {
-	unsigned int _cursor = 0; // Cursor for use in this scope.
+	unsigned long int _cursor = 0; // Cursor for use in this scope.
 	while(*(schemafile_map + _cursor) != '\0')
 	{
 		// Skip any lines that are comments or part of another table's spec:
@@ -28,7 +28,7 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned int *cursor)
 			{
 				if(*(schemafile_map + _cursor) == '\0')
 				{
-					printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, _cursor);
+					printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, (unsigned int)_cursor);
 					return 1;
 				}
 				_cursor++;
@@ -46,7 +46,7 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned int *cursor)
 					*cursor = _cursor;
 					if(*(schemafile_map + *cursor) != '\t')
 					{
-						printf(BOLD RED "Schema file error!\nMalformed line at position 0x%x found by schemaSeek()\n" RESET, *cursor);
+						printf(BOLD RED "Schema file error!\nMalformed line at position 0x%x found by schemaSeek()\n" RESET, (unsigned int)(*cursor));
 						return 1;
 					}
 					return 0;
@@ -61,7 +61,7 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned int *cursor)
 					{
 						if(*(schemafile_map + _cursor) == '\0')
 						{
-							printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, _cursor);
+							printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, (unsigned int)_cursor);
 							break;
 						}
 						_cursor++;
@@ -83,7 +83,7 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned int *cursor)
 
 // This function gets the primary key identifier. Cursor should be on the tab
 // at the beginning of the line. Return 1 on error, 0 otherwise:
-int schemaPI(char *schemafile_map, table_t *table, unsigned int *cursor)
+int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 {
 	int _cursor = *cursor;
 	char PIname[MAX_COLUMN_NAME_LEN + 1];
@@ -105,7 +105,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned int *cursor)
 		_cursor++;
 		if(*(schemafile_map + _cursor) != '\n')
 		{
-			printf(BOLD RED "Schema file error!\nUnexpected char at position 0x%x\n" RESET, _cursor);
+			printf(BOLD RED "Schema file error!\nUnexpected char at position 0x%x\n" RESET, (unsigned int)_cursor);
 			return 1;
 		}
 		_cursor++;
@@ -172,7 +172,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned int *cursor)
 			}
 			else if(*(schemafile_map + _cursor) == '\0')
 			{
-				printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, _cursor);
+				printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, (unsigned int)_cursor);
 				return 1;
 			}
 			else
@@ -201,9 +201,9 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned int *cursor)
 // This function fetches the operator and arguments from one line of the schema
 // file. Cursor should be on the tab preceeding the declaration. Return 1 on
 // error, return 0 otherwise.
-int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsigned int *cursor)
+int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsigned long int *cursor)
 {
-	unsigned int _cursor = *cursor;
+	unsigned long int _cursor = *cursor;
 	if(*(schemafile_map + _cursor) != '\t')
 	{
 		if(*(schemafile_map + _cursor) == '#' || *(schemafile_map + _cursor) == '\0')
@@ -215,7 +215,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 		}
 		else
 		{
-			printf(BOLD RED "Schema file error!\nMalformed line at position 0x%x found by schemaFetchLine()\n" RESET, _cursor);
+			printf(BOLD RED "Schema file error!\nMalformed line at position 0x%x found by schemaFetchLine()\n" RESET, (unsigned int)_cursor);
 			return 1;
 		}
 	}
@@ -224,12 +224,12 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 	{
 		if(*(schemafile_map + _cursor) == '!')
 		{
-			printf(BOLD RED "Schema file error!\nUnexpected '!' at position 0x%x\n" RESET, _cursor);
+			printf(BOLD RED "Schema file error!\nUnexpected '!' at position 0x%x\n" RESET, (unsigned int)_cursor);
 			return 1;
 		}
 		else if(*(schemafile_map + _cursor) == '\n')
 		{
-			printf(BOLD RED "Schema file error!\nUnexpected line feed at position 0x%x\n" RESET, _cursor);
+			printf(BOLD RED "Schema file error!\nUnexpected line feed at position 0x%x\n" RESET, (unsigned int)_cursor);
 			return 1;
 		}
 		else if(*(schemafile_map + _cursor) == '>' || *(schemafile_map + _cursor) == '?' || *(schemafile_map + _cursor) == '*' || *(schemafile_map + _cursor) == '@' || *(schemafile_map + _cursor) == '&')
