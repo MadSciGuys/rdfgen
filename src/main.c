@@ -174,6 +174,7 @@ int main(int argc, char *argv[])
 				return 1;
 			}
 			triples = 0;
+			free(emptyfilename);
 			continue;
 		}
 		// Get the column names:
@@ -279,5 +280,7 @@ int main(int argc, char *argv[])
 		memset(&start_time_spec,'\0',sizeof(start_time_spec));
 		memset(&end_time_spec,'\0',sizeof(end_time_spec));
 	}
+	free(table);
+	free(row_buffer);
 	return 0;
 }

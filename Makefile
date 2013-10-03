@@ -28,3 +28,16 @@ uninstall:
 clean:
 	rm -f *.o
 	rm -f $(EXECUTABLE)
+	rm -f debug-rdfgen
+
+debug: interface.o.debug parser.o.debug generator.o.debug
+	$(CC) -O0 -g $(INCLUDE) -o debug-rdfgen src/main.c interface.o parser.o generator.o $(LINKARGS)
+
+interface.o.debug: parser.o.debug
+	$(CC) -c -O0 -g $(INCLUDE) src/rdfgen/interface.c
+
+parser.o.debug:
+	$(CC) -c -O0 -g $(INCLUDE) src/rdfgen/parser.c
+
+generator.o.debug:
+	$(CC) -c -O0 -g $(INCLUDE) src/rdfgen/generator.c

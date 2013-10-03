@@ -90,8 +90,8 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 	char FKname[MAX_TABLE_NAME_LEN + 1];
 
 	table->primaryIdentifier = -2; // Set value OOR for error detection.
-
 	_cursor++;
+
 	if(*(schemafile_map + _cursor) != '!')
 	{
 		printf(BOLD RED "Schema file error!\nNo Primary Identifier defined in schema file for table %s\n" RESET, table->tableName);
