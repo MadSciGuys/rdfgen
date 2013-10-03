@@ -174,7 +174,6 @@ int main(int argc, char *argv[])
 				return 1;
 			}
 			triples = 0;
-			free(emptyfilename);
 			continue;
 		}
 		// Get the column names:
