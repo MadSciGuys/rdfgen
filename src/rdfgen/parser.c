@@ -86,8 +86,8 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned long int *cursor)
 int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 {
 	int _cursor = *cursor;
-	char PIname[MAX_COLUMN_NAME_LEN + 1];
-	char FKname[MAX_TABLE_NAME_LEN + 1];
+	char PIname[MAX_COLUMN_NAME_LEN + 1] = {};
+	char FKname[MAX_TABLE_NAME_LEN + 1] = {};
 
 	table->primaryIdentifier = -2; // Set value OOR for error detection.
 	_cursor++;
