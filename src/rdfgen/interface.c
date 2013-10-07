@@ -120,7 +120,7 @@ int getColumnNames(char *inputfile_map, table_t *table)
 				}
 				break;
 			}
-			if(table->columns[column].columnName[MAX_COLUMNS] != '\0')
+			if(table->columns[column].columnName[MAX_COLUMN_NAME_LEN + 1] != '\0')
 			{
 				printf(BOLD RED "Input file error!\nName of column %d in table %s is too long.\n" RESET, (column + 1), table->tableName);
 				return 1;
