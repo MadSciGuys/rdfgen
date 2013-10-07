@@ -260,7 +260,6 @@ void outputHeader(FILE *outputfile, table_t *table, unsigned long int *triples)
 void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_t *row_buffer, unsigned long int *triples)
 {
 	unsigned long int cursor;
-	bool leaf;
 	// Seek to the beginning of the first data line:
 	for(cursor = 0; cursor < ((MAX_COLUMN_NAME_LEN + 1) * MAX_COLUMNS); cursor++)
 	{
