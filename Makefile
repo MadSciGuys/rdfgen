@@ -2,7 +2,7 @@
 # twhitak@its.jnj.com
 
 CC = clang
-CFLAGS = -Weverything -O2
+CFLAGS = -Wall -Wextra -pedantic -O2
 INCLUDE = -I./include
 EXECUTABLE = rdfgen
 LINKARGS = -lrt
@@ -31,13 +31,13 @@ clean:
 	rm -f debug-rdfgen
 
 debug: interface.o.debug parser.o.debug generator.o.debug
-	$(CC) -O0 -g -Weverything$(INCLUDE) -o debug-rdfgen src/main.c interface.o parser.o generator.o $(LINKARGS)
+	$(CC) -O0 -g -Wall -Wextra -pedantic $(INCLUDE) -o debug-rdfgen src/main.c interface.o parser.o generator.o $(LINKARGS)
 
 interface.o.debug: parser.o.debug
-	$(CC) -c -O0 -g -Weverything $(INCLUDE) src/rdfgen/interface.c
+	$(CC) -c -O0 -g -Wall -Wextra -pedantic $(INCLUDE) src/rdfgen/interface.c
 
 parser.o.debug:
-	$(CC) -c -O0 -g -Weverything $(INCLUDE) src/rdfgen/parser.c
+	$(CC) -c -O0 -g -Wall -Wextra -pedantic $(INCLUDE) src/rdfgen/parser.c
 
 generator.o.debug:
-	$(CC) -c -O0 -g -Weverything $(INCLUDE) src/rdfgen/generator.c
+	$(CC) -c -O0 -g -Wall -Wextra -pedantic $(INCLUDE) src/rdfgen/generator.c
