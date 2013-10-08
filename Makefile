@@ -8,7 +8,7 @@ EXECUTABLE = rdfgen
 LINKARGS = -lrt
 
 all: interface.o parser.o generator.o
-	$(CC) $(CFLAGS) $(INCLUDE) -o $(EXECUTABLE) src/main.c interface.o parser.o generator.o $(LINKARGS)
+	$(CC) $(CFLAGS) $(INCLUDE)  -o $(EXECUTABLE) src/main.c interface.o parser.o generator.o $(LINKARGS)
 
 interface.o: parser.o
 	$(CC) -c $(CFLAGS) $(INCLUDE) src/rdfgen/interface.c

@@ -23,8 +23,6 @@
 
 #include <rdfgen/interface.h>
 
-
-
 // Utility functions:
 int checkLeaf(table_t *table);
 int checkVirt(table_t *table);

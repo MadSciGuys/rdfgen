@@ -12,8 +12,6 @@
 #include <rdfgen/structure.h>
 #include <rdfgen/color.h>
 
-
-
 // This function seeks to the target table in the schema file, leaving the
 // cursor on the tab after the newline. Return 1 upon error, 0 otherwise:
 int schemaSeek(char *schemafile_map, char *tableName, unsigned long int *cursor)
@@ -22,7 +20,7 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned long int *cursor)
 	while(*(schemafile_map + _cursor) != '\0')
 	{
 		// Skip any lines that are comments or part of another table's spec:
-		if(*(schemafile_map + _cursor) == '~' || *(schemafile_map + _cursor) == '\t')
+		if( *(schemafile_map + _cursor) == '\t')
 		{
 			while(*(schemafile_map + _cursor) != '\n')
 			{
@@ -38,7 +36,7 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned long int *cursor)
 		else if(*(schemafile_map + _cursor) == '#')
 		{
 			_cursor++;
-			for(int i = 0; i < MAX_TABLE_NAME_LEN + 1; i++)
+			for(unsigned int i = 0; i < MAX_TABLE_NAME_LEN + 1; i++)
 			{
 				if(tableName[i] == '\0' && *(schemafile_map + _cursor) == '\n')
 				{
@@ -73,7 +71,7 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned long int *cursor)
 		}
 		else
 		{
-			printf(BOLD RED "Schema file error!\nFound line that does not begin with ~, !, or tab\n" RESET);
+			printf(BOLD RED "Schema file error!\nFound line that does not begin with '!' or tab\n" RESET);
 			return 1;
 		}
 	}
@@ -117,7 +115,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 		*cursor = _cursor;
 		return 0;
 	}
-	for(int i = 0; i < MAX_COLUMN_NAME_LEN + 1; i++)
+	for(unsigned int i = 0; i < MAX_COLUMN_NAME_LEN + 1; i++)
 	{
 		if(*(schemafile_map + _cursor) == '@' || *(schemafile_map + _cursor) == '\n')
 		{
@@ -140,7 +138,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 		printf(BOLD RED "Schema file error!\nTable %s: Primary Identifier too long.\n" RESET, table->tableName);
 		return 1;
 	}
-	for(int i = 0; i < MAX_COLUMNS; i++)
+	for(unsigned int i = 0; i < MAX_COLUMNS; i++)
 	{
 		if(strncmp(PIname, table->columns[i].columnName, MAX_COLUMN_NAME_LEN + 1) == 0)
 		{
@@ -163,7 +161,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 	else if(*(schemafile_map + _cursor) == '@')
 	{
 		_cursor++;
-		for(int i = 0; i < MAX_TABLE_NAME_LEN; i++)
+		for(unsigned int i = 0; i < MAX_TABLE_NAME_LEN; i++)
 		{
 			if(*(schemafile_map + _cursor) == '\n')
 			{
@@ -220,7 +218,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 		}
 	}
 	_cursor++;
-	for(int i = 0; i < MAX_COLUMN_NAME_LEN; i++)
+	for(unsigned int i = 0; i < MAX_COLUMN_NAME_LEN; i++)
 	{
 		if(*(schemafile_map + _cursor) == '!')
 		{
@@ -265,7 +263,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 		}
 	}
 	_cursor++;
-	for(int i = 0; i < MAX_FIELD_LEN; i++)
+	for(unsigned int i = 0; i < MAX_FIELD_LEN; i++)
 	{
 		if(*(schemafile_map + _cursor) == '\n' || *(schemafile_map + _cursor) == '\0')
 		{

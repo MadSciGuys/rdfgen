@@ -13,41 +13,36 @@
 #include <rdfgen/generator.h>
 #include <rdfgen/color.h>
 
-
-
 // This function gets the table's name from the input file name, puts it into
 // the table metadata struct, then computes the output file name. Returns -1
 // on error, 0 on success.
 int getTableName(char *inputfilename, char *outputfilename, table_t *table)
 {
-	// Iterate over the file name to get the table name:
-	for(int i = 0; i < MAX_TABLE_NAME_LEN + 1; i++)
+	for(unsigned int i = 0; i < MAX_TABLE_NAME_LEN + 1; i++)
 	{
-		if(*(inputfilename + i) == '.') // Beginning of extension.
+		if(*(inputfilename + i) == '.')
 		{
 			table->tableName[i] = '\0';
 			break;
 		}
-		else // Otherwise copy the character.
+		else
 		{
 			table->tableName[i] = *(inputfilename + i);
 		}
 	}
-	// If the last char isn't null, then the table name was too long:
 	if(table->tableName[MAX_TABLE_NAME_LEN] != '\0')
 	{
 		printf(BOLD RED "File name error!\nThe table name in file %s is too long.\n" RESET, inputfilename);
 		return -1;
 	}
-	// Now make the output file name:
-	for(int i = 0; i < MAX_TABLE_NAME_LEN + 1; i++)
+	for(unsigned int i = 0; i < MAX_TABLE_NAME_LEN + 1; i++)
 	{
-		if(table->tableName[i] == '\0') // Now write the extension.
+		if(table->tableName[i] == '\0')
 		{
 			snprintf((outputfilename + i), RDF_EXT_LEN + 1, RDF_EXT);
 			break;
 		}
-		else // Otherwise copy the character.
+		else
 		{
 			*(outputfilename + i) = table->tableName[i];
 		}
@@ -68,7 +63,6 @@ int checkEmpty(char *inputfile_map)
 			break;
 		}
 	}
-	// Make sure we didn't fall out of the loop:
 	if(*(inputfile_map + cursor) != '\n')
 	{
 		printf(BOLD RED "Input file error!\nFirst line is too long!\n" RESET);
@@ -87,7 +81,7 @@ int checkEmpty(char *inputfile_map)
 int getColumnNames(char *inputfile_map, table_t *table)
 {
 	unsigned long int cursor = 0;
-	int column;
+	unsigned int column;
 	for(column = 0; column < MAX_COLUMNS; column++)
 	{
 		if(*(inputfile_map + cursor) == ',')
@@ -97,7 +91,7 @@ int getColumnNames(char *inputfile_map, table_t *table)
 		}
 		else
 		{
-			for(int i = 0; i < MAX_COLUMN_NAME_LEN + 1; i++)
+			for(unsigned int i = 0; i < MAX_COLUMN_NAME_LEN + 1; i++)
 			{
 				if(*(inputfile_map + cursor) == ',' || *(inputfile_map + cursor) == '\n')
 				{
@@ -142,30 +136,24 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 	char arg1[MAX_COLUMN_NAME_LEN + 1]; // First argument is always a column name.
 	char arg2[MAX_FIELD_LEN + 1]; // Second argument may be a column name or default field value.
 
-	// First, seek to the correct spot in the file:
 	if(schemaSeek(schemafile_map, table->tableName, &cursor) == 1)
 	{
 		return 1;
 	}
-	// The primary identifier must come next:
 	if(schemaPI(schemafile_map, table, &cursor) == 1)
 	{
 		printf(BOLD RED "Parsing error under table %s\n" RESET, table->tableName);
 		return 1;
 	}
-	// Process each following line in turn:
 	while(op != '#')
 	{
-		// Clean up after the previous iteration:
 		memset(arg1, '\0', MAX_COLUMN_NAME_LEN + 1);
 		memset(arg2, '\0', MAX_FIELD_LEN + 1);
 		op = '\0';
-		// Fetch the next line:
 		if(schemaFetchLine(schemafile_map, &op, arg1, arg2, &cursor) == 1)
 		{
 			return 1;
 		}
-		// Handle the op:
 		switch(op)
 		{
 		case '>':
@@ -207,6 +195,59 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 		}
 	}
 	return 0;
+}
+
+void printTableMetadata(table_t *table)
+{
+	printf("%s, %d columns\n", table->tableName, table->totalColumns);
+	if(table->primaryIdentifier == -1)
+	{
+		printf(BOLD CYAN "No Primary Identifier\n" RESET);
+	}
+	else
+	{
+		printf("Primary Identifier: " BOLD BLUE "%s\n" RESET, table->columns[table->primaryIdentifier].columnName);
+	}
+	printf("Columns:\n");
+	for(int i = 0; i < table->totalColumns; i++)
+	{
+		printf("%4d: %-32s", i + 1, table->columns[i].columnName);
+		switch(table->columns[i].type)
+		{
+		case real:
+			printf("%-12s", "real");
+			break;
+		case req:
+			printf(BOLD RED "%-12s" RESET, "required");
+			break;
+		case virt:
+			printf(BOLD MAGENTA "%-12s" RESET, "virtual");
+			break;
+		default:
+			printf(BOLD RED REVERSE BLINK "%-12s" RESET, "!!!!!!");
+			break;
+		}
+		switch(table->columns[i].FKtarget[0])
+		{
+		case '\0':
+			printf(BOLD GREEN "%-38s" RESET, "independent");
+			break;
+		default:
+			printf(BOLD YELLOW "->%-36s" RESET, table->columns[i].FKtarget);
+			break;
+		}
+		switch(table->columns[i].defaultValue.data[0])
+		{
+		case '\0':
+			printf(BOLD GREEN "no default value" RESET);
+			break;
+		default:
+			printf(BOLD MAGENTA "default value: %s" RESET, table->columns[i].defaultValue.data);
+			break;
+		}
+		printf("\n");
+	}
+	return;
 }
 
 // This function outputs the RDF header. If we've gotten this far, the only
@@ -269,6 +310,7 @@ void outputTriples(FILE *outputfile, char *inputfile_map, table_t *table, field_
 			break;
 		}
 	}
+	// Huge nasty decision tree to determine which generating function to use:
 	if(checkVirt(table) == 1)
 	{
 		if(checkReq(table) == 0)

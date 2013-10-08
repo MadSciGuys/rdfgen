@@ -13,8 +13,6 @@
 #include <rdfgen/generator.h>
 #include <rdfgen/color.h>
 
-
-
 // Return 1 if table has no FKs, 0 otherwise.
 int checkLeaf(table_t *table)
 {
@@ -54,8 +52,8 @@ int checkReq(table_t *table)
 	return 1;
 }
 
-// This function reads one row of a CSV file into a buffer. Return 1 if EOF is
-// found, 0 otherwise. Undefined behavior if a cell if bigger than MAX_FIELD_LEN!
+// Read one row of a CSV file into a buffer. Return 1 if EOF is found,
+// 0 otherwise. Undefined behavior if a cell if bigger than MAX_FIELD_LEN.
 int readRow(char *inputfile_map, unsigned long int *cursor, field_t *row_buffer)
 {
 	if(*(inputfile_map + *cursor) == '\0')
@@ -445,9 +443,7 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 	}
 }
 
-
 //These functions assume there are no virtual columns:
-
 
 // This function generates triples for an anonymous leaf table.
 void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
@@ -742,11 +738,7 @@ void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 	}
 }
 
-
-
 // These functions assume there are no required columns(except for the FK):
-
-
 
 // This function generates triples for an anonymous leaf table.
 void genTriples_anon_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
@@ -996,9 +988,7 @@ void genTriples_pifk_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 	}
 }
 
-
 //These functions assume there are no virtual columns:
-
 
 // This function generates triples for an anonymous leaf table.
 void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples)
