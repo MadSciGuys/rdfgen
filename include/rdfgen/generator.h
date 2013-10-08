@@ -27,7 +27,6 @@
 int checkLeaf(table_t *table);
 int checkVirt(table_t *table);
 int checkReq(table_t *table);
-int readRow(char *inputfile_map, unsigned long int *cursor, field_t *row_buffer);
 
 // No-assumption generator functions:
 void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);

@@ -54,7 +54,7 @@ int checkReq(table_t *table)
 
 // Read one row of a CSV file into a buffer. Return 1 if EOF is found,
 // 0 otherwise. Undefined behavior if a cell if bigger than MAX_FIELD_LEN.
-int readRow(char *inputfile_map, unsigned long int *cursor, field_t *row_buffer)
+static int readRow(char *inputfile_map, unsigned long int *cursor, field_t *row_buffer)
 {
 	if(*(inputfile_map + *cursor) == '\0')
 	{
