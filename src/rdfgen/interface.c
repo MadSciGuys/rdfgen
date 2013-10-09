@@ -276,7 +276,7 @@ void outputHeader(FILE *outputfile, table_t *table, unsigned long int *triples)
 			// Otherwise, it is a protery of the FK target referring to the current table.
 			else
 			{
-				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n", table->tableName, table->columns[i].columnName, table->columns[i].FKtarget, table->tableName);
+				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n", table->columns[i].columnName, table->columns[i].FKtarget, table->tableName);
 				(*triples) += 3;
 			}
 		}
@@ -284,12 +284,12 @@ void outputHeader(FILE *outputfile, table_t *table, unsigned long int *triples)
 		{
 			if(table->columns[i].FKtarget[0] == '\0')
 			{
-				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"%s\"/>\n</rdf:Property>\n\n", table->tableName, table->columns[i].columnName, table->tableName);
+				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s\">\n  <rdfs:domain rdf:resource=\"%s\"/>\n</rdf:Property>\n\n", table->columns[i].columnName, table->tableName);
 				(*triples) += 2;
 			}
 			else
 			{
-				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s_%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n", table->tableName, table->columns[i].columnName, table->tableName, table->columns[i].FKtarget);
+				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n", table->columns[i].columnName, table->tableName, table->columns[i].FKtarget);
 				(*triples) += 3;
 			}
 		}
