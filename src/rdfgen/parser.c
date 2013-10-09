@@ -257,7 +257,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 
 // This function fetches the operator and arguments from one line of the schema
 // file. Cursor should be on the tab preceeding the declaration. Return 1 on
-// error, return 0 otherwise.
+// error, return 0 otherwise:
 int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsigned long int *cursor)
 {
 	unsigned long int _cursor = *cursor;
@@ -409,7 +409,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 	}
 }
 
-// This function renames a column. Return 1 on error, 0 otherwise.
+// This function renames a column. Return 1 on error, 0 otherwise:
 int renameColumn(char *arg1, char *arg2, table_t *table)
 {
 	int colnum = -1;
@@ -439,7 +439,7 @@ int renameColumn(char *arg1, char *arg2, table_t *table)
 }
 
 // This function defines a default value for a column. Return 1 on error,
-// return 0 otherwise.
+// return 0 otherwise:
 int defineDV(char *arg1, char *arg2, table_t *table)
 {
 	int colnum = -1;
@@ -479,7 +479,7 @@ int defineDV(char *arg1, char *arg2, table_t *table)
 }
 
 // This function marks a column as required. Return 1 on error,
-// return 0 otherwise.
+// return 0 otherwise:
 int requireColumn(char *arg1, table_t *table)
 {
 	int colnum = -1;
@@ -516,7 +516,7 @@ int requireColumn(char *arg1, table_t *table)
 	}
 }
 
-// This function sets a column's FK target. Return 1 on error, 0 otherwise.
+// This function sets a column's FK target. Return 1 on error, 0 otherwise:
 int defineFK(char *arg1, char *arg2, table_t *table)
 {
 	int colnum = -1;
@@ -546,7 +546,7 @@ int defineFK(char *arg1, char *arg2, table_t *table)
 }
 
 // This function defines a new virtual column and it's default value. Return
-// 1 on error, return 0 on success.
+// 1 on error, return 0 on success:
 int defineVC(char *arg1, char *arg2, table_t *table)
 {
 	if((table->totalColumns + 1) > MAX_COLUMNS)

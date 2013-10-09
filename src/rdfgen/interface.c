@@ -18,7 +18,7 @@
 
 // This function gets the table's name from the input file name, puts it into
 // the table metadata struct, then computes the output file name. Returns -1
-// on error, 0 on success.
+// on error, 0 on success:
 int getTableName(char *inputfilename, char *outputfilename, table_t *table)
 {
 	for(unsigned int i = 0; i < MAX_TABLE_NAME_LEN + 1; i++)
@@ -58,7 +58,7 @@ int getTableName(char *inputfilename, char *outputfilename, table_t *table)
 }
 
 // This function checks to make sure the input file isn't empty. Return 0 if
-// the file is not empty, return 1 if it is, return -1 on fatal error.
+// the file is not empty, return 1 if it is, return -1 on fatal error:
 int checkEmpty(char *inputfile_map)
 {
 	unsigned long int cursor;
@@ -88,7 +88,7 @@ int checkEmpty(char *inputfile_map)
 }
 
 // This function gets the names of the columns from the first line of the input
-// file and populates the table metadata. Returns 1 on error, 0 on success.
+// file and populates the table metadata. Returns 1 on error, 0 on success:
 int getColumnNames(char *inputfile_map, table_t *table)
 {
 	unsigned long int cursor = 0;
@@ -335,12 +335,12 @@ void outputHeader(FILE *outputfile, table_t *table, unsigned long int *triples)
 	{
 		if(i == table->primaryIdentifier)
 		{
-			// If the PI is not an FK, it is a component of the node name and is therefore NOT a property.
+			// If the PI is not an FK, it is a component of the node name and is therefore NOT a property:
 			if(table->columns[i].FKtarget[0] == '\0')
 			{
 				continue;
 			}
-			// Otherwise, it is a protery of the FK target referring to the current table.
+			// Otherwise, it is a protery of the FK target referring to the current table:
 			else
 			{
 				fprintf(outputfile, "<rdf:Property rdf:ID=\"%s\">\n  <rdfs:domain rdf:resource=\"#%s\"/>\n  <rdfs:range rdf:resource=\"#%s\"/>\n</rdf:Property>\n\n", table->columns[i].columnName, table->columns[i].FKtarget, table->tableName);

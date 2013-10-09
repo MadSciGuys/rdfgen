@@ -4,7 +4,6 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-// Define shortcuts for ASCII color control codes:
 #define RED "\x1b[31m"
 #define GREEN "\x1b[32m"
 #define YELLOW "\x1b[33m"

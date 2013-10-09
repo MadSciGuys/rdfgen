@@ -4,9 +4,7 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
-// Here we define the static parts of the RDF header:
-
-// Define the XML version string:
+// XML version string:
 #define XML_VERSION "<?xml version=\"1.0\"?>"
 
 // Doctype string:
@@ -23,7 +21,6 @@
 
 #include <rdfgen/interface.h>
 
-// Utility functions:
 int checkLeaf(table_t *table);
 int checkVirt(table_t *table);
 int checkReq(table_t *table);
@@ -35,21 +32,21 @@ void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 void genTriples_anon_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 
-// Generator functions assuming no required columns:
+// Assuming no required columns:
 void genTriples_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 void genTriples_pifk_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 void genTriples_anon_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 void genTriples_anon_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 void genTriples_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 
-// Generator functions assuming no virtual columns:
+// Assuming no virtual columns:
 void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 void genTriples_anon_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 
-// Generator functions assuming no virtual columns and no required columns:
+// Assuming no virtual columns and no required columns:
 void genTriples_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 void genTriples_pifk_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);
 void genTriples_anon_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, FILE *outputfile, field_t *row_buffer, table_t *table, unsigned long int *triples);

@@ -14,6 +14,12 @@
  * are in bytes and disregarding the terminating null byte(where applicable).
  */
 
+/*
+ * DON'T try to be clever and large powers of two here with the hope of
+ * optimizing MMU instructions. The allocator will do this for you if it makes
+ * sense. These limits are intended to be used for data-curation purposes.
+ */
+
 // Define parameters of the output extension:
 #define RDF_EXT ".rdf"
 #define RDF_EXT_LEN 4

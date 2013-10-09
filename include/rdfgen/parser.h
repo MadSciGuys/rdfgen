@@ -6,8 +6,6 @@
 
 #include <rdfgen/interface.h>
 
-// These functions are used to parse the schema file and write the table
-// metadata memory segment:
 int schemaSeek(char *schemafile_map, char *tableName, unsigned long int *cursor);
 int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor);
 int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsigned long int *cursor);
