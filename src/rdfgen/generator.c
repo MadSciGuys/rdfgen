@@ -11,7 +11,10 @@
 #include <rdfgen/interface.h>
 #include <rdfgen/structure.h>
 #include <rdfgen/generator.h>
+
+#ifndef NO_COLOR
 #include <rdfgen/color.h>
+#endif
 
 // Return 1 if table has no FKs, 0 otherwise.
 int checkLeaf(table_t *table)
@@ -125,7 +128,11 @@ void genTriples_anon_leaf(char *inputfile_map, unsigned long int *cursor, FILE *
 				// If not, warn the user.
 				else
 				{
+#ifdef NO_COLOR
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
+#else
 					printf(BOLD RED "Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\n" GREEN REVERSE "Continuing...\n" RESET, table->columns[i].columnName, table->tableName);
+#endif
 				}
 			}
 			// If not, write nil:
@@ -199,7 +206,11 @@ void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				// If not, warn the user.
 				else
 				{
+#ifdef NO_COLOR
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
+#else
 					printf(BOLD RED "Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\n" GREEN REVERSE "Continuing...\n" RESET, table->columns[i].columnName, table->tableName);
+#endif
 				}
 			}
 			// If not, write nil:
@@ -220,7 +231,11 @@ void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -256,7 +271,11 @@ void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				// If not, warn the user.
 				else
 				{
+#ifdef NO_COLOR
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
+#else
 					printf(BOLD RED "Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\n" GREEN REVERSE "Continuing...\n" RESET, table->columns[i].columnName, table->tableName);
+#endif
 				}
 			}
 			// If not, write nil:
@@ -277,7 +296,11 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -341,7 +364,11 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 				// If not, warn the user.
 				else
 				{
+#ifdef NO_COLOR
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
+#else
 					printf(BOLD RED "Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\n" GREEN REVERSE "Continuing...\n" RESET, table->columns[i].columnName, table->tableName);
+#endif
 				}
 			}
 			// If not, write nil:
@@ -362,7 +389,11 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -425,7 +456,11 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				// If not, warn the user.
 				else
 				{
+#ifdef NO_COLOR
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
+#else
 					printf(BOLD RED "Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\n" GREEN REVERSE "Continuing...\n" RESET, table->columns[i].columnName, table->tableName);
+#endif
 				}
 			}
 			// If not, write nil:
@@ -472,7 +507,11 @@ void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned long int *cursor
 				// If not, warn the user.
 				else
 				{
+#ifdef NO_COLOR
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
+#else
 					printf(BOLD RED "Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\n" GREEN REVERSE "Continuing...\n" RESET, table->columns[i].columnName, table->tableName);
+#endif
 				}
 			}
 			// If not, write nil:
@@ -531,7 +570,11 @@ void genTriples_anon_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 				// If not, warn the user.
 				else
 				{
+#ifdef NO_COLOR
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
+#else
 					printf(BOLD RED "Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\n" GREEN REVERSE "Continuing...\n" RESET, table->columns[i].columnName, table->tableName);
+#endif
 				}
 			}
 			// If not, write nil:
@@ -552,7 +595,11 @@ void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -582,7 +629,11 @@ void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 				// If not, warn the user.
 				else
 				{
+#ifdef NO_COLOR
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
+#else
 					printf(BOLD RED "Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\n" GREEN REVERSE "Continuing...\n" RESET, table->columns[i].columnName, table->tableName);
+#endif
 				}
 			}
 			// If not, write nil:
@@ -603,7 +654,11 @@ void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *ou
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -651,7 +706,11 @@ void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *ou
 				// If not, warn the user.
 				else
 				{
+#ifdef NO_COLOR
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
+#else
 					printf(BOLD RED "Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\n" GREEN REVERSE "Continuing...\n" RESET, table->columns[i].columnName, table->tableName);
+#endif
 				}
 			}
 			// If not, write nil:
@@ -672,7 +731,11 @@ void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -720,7 +783,11 @@ void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 				// If not, warn the user.
 				else
 				{
+#ifdef NO_COLOR
+					printf("Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\nContinuing...\n", table->columns[i].columnName, table->tableName);
+#else
 					printf(BOLD RED "Input file error!\nColumn %s in table %s is specified as required, but an empty cell was found.\n" GREEN REVERSE "Continuing...\n" RESET, table->columns[i].columnName, table->tableName);
+#endif
 				}
 			}
 			// If not, write nil:
@@ -829,7 +896,11 @@ void genTriples_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -871,7 +942,11 @@ void genTriples_no_req(char *inputfile_map, unsigned long int *cursor, FILE *out
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -931,7 +1006,11 @@ void genTriples_pifk_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -1058,7 +1137,11 @@ void genTriples_leaf_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -1094,7 +1177,11 @@ void genTriples_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, F
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);
@@ -1139,7 +1226,11 @@ void genTriples_pifk_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 	{
 		if((row_buffer + (table->primaryIdentifier))->data[0] == '\0')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nTable %s has row missing Primary Identifier %s\nContinuing...\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
+#else
 			printf(BOLD RED "Input file error!\nTable %s has row missing Primary Identifier %s\n" GREEN REVERSE "Continuing...\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
+#endif
 			continue;
 		}
 		fprintf(outputfile,"<%s:%s rdf:ID=\"%s_%s\">\n", PREFIX, table->tableName, table->tableName, (row_buffer + (table->primaryIdentifier))->data);

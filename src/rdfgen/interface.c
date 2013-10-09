@@ -11,7 +11,10 @@
 #include <rdfgen/interface.h>
 #include <rdfgen/structure.h>
 #include <rdfgen/generator.h>
+
+#ifndef NO_COLOR
 #include <rdfgen/color.h>
+#endif
 
 // This function gets the table's name from the input file name, puts it into
 // the table metadata struct, then computes the output file name. Returns -1
@@ -32,7 +35,11 @@ int getTableName(char *inputfilename, char *outputfilename, table_t *table)
 	}
 	if(table->tableName[MAX_TABLE_NAME_LEN] != '\0')
 	{
+#ifdef NO_COLOR
+		printf("File name error!\nThe table name in file %s is too long.\n", inputfilename);
+#else
 		printf(BOLD RED "File name error!\nThe table name in file %s is too long.\n" RESET, inputfilename);
+#endif
 		return -1;
 	}
 	for(unsigned int i = 0; i < MAX_TABLE_NAME_LEN + 1; i++)
@@ -65,7 +72,11 @@ int checkEmpty(char *inputfile_map)
 	}
 	if(*(inputfile_map + cursor) != '\n')
 	{
+#ifdef NO_COLOR
+		printf("Input file error!\nFirst line is too long!\n");
+#else
 		printf(BOLD RED "Input file error!\nFirst line is too long!\n" RESET);
+#endif
 		return -1;
 	}
 	cursor++;
@@ -86,7 +97,11 @@ int getColumnNames(char *inputfile_map, table_t *table)
 	{
 		if(*(inputfile_map + cursor) == ',')
 		{
+#ifdef NO_COLOR
+			printf("Input file error!\nName of column %d in table %s is blank.\n", (column +1), table->tableName);
+#else
 			printf(BOLD RED "Input file error!\nName of column %d in table %s is blank.\n" RESET, (column +1), table->tableName);
+#endif
 			return 1;
 		}
 		else
@@ -109,14 +124,22 @@ int getColumnNames(char *inputfile_map, table_t *table)
 			{
 				if(table->columns[column].columnName[0] == '\0')
 				{
+#ifdef NO_COLOR
+					printf("Input file error!\nName of column %d in table %s is blank.\n", (column +1), table->tableName);
+#else
 					printf(BOLD RED "Input file error!\nName of column %d in table %s is blank.\n" RESET, (column +1), table->tableName);
+#endif
 					return 1;
 				}
 				break;
 			}
 			if(table->columns[column].columnName[MAX_COLUMN_NAME_LEN + 1] != '\0')
 			{
+#ifdef NO_COLOR
+				printf("Input file error!\nName of column %d in table %s is too long.\n", (column + 1), table->tableName);
+#else
 				printf(BOLD RED "Input file error!\nName of column %d in table %s is too long.\n" RESET, (column + 1), table->tableName);
+#endif
 				return 1;
 			}
 			cursor++;
@@ -142,7 +165,11 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 	}
 	if(schemaPI(schemafile_map, table, &cursor) == 1)
 	{
+#ifdef NO_COLOR
+		printf("Parsing error under table %s\n", table->tableName);
+#else
 		printf(BOLD RED "Parsing error under table %s\n" RESET, table->tableName);
+#endif
 		return 1;
 	}
 	while(op != '#')
@@ -189,7 +216,11 @@ int getTableMetadata(char *schemafile_map, table_t *table)
 		case '#':
 			break;
 		default:
+#ifdef NO_COLOR
+			printf("INTERNAL EXECUTION STATE ERROR!\nSomething really bad happened in the function getTableMetadata()!\nInvalid value of switch char operator at location 0x%x!\n", (unsigned int)&op);
+#else
 			printf(BOLD MAGENTA REVERSE BLINK "INTERNAL EXECUTION STATE ERROR!\n" RED "Something really bad happened in the function getTableMetadata()!" YELLOW "\nInvalid value of switch char operator at location 0x%x!\n" RESET, (unsigned int)&op);
+#endif
 			return 1;
 			break;
 		}
@@ -202,11 +233,19 @@ void printTableMetadata(table_t *table)
 	printf("%s, %d columns\n", table->tableName, table->totalColumns);
 	if(table->primaryIdentifier == -1)
 	{
+#ifdef NO_COLOR
+		printf("No Primary Identifier\n");
+#else
 		printf(BOLD CYAN "No Primary Identifier\n" RESET);
+#endif
 	}
 	else
 	{
+#ifdef NO_COLOR
+		printf("Primary Identifier: %s\n", table->columns[table->primaryIdentifier].columnName);
+#else
 		printf("Primary Identifier: " BOLD BLUE "%s\n" RESET, table->columns[table->primaryIdentifier].columnName);
+#endif
 	}
 	printf("Columns:\n");
 	for(int i = 0; i < table->totalColumns; i++)
@@ -218,31 +257,59 @@ void printTableMetadata(table_t *table)
 			printf("%-12s", "real");
 			break;
 		case req:
+#ifdef NO_COLOR
+			printf("%-12s", "required");
+#else
 			printf(BOLD RED "%-12s" RESET, "required");
+#endif
 			break;
 		case virt:
+#ifdef NO_COLOR
+			printf("%-12s", "virtual");
+#else
 			printf(BOLD MAGENTA "%-12s" RESET, "virtual");
+#endif
 			break;
 		default:
+#ifdef NO_COLOR
+			printf("%-12s", "!!!!!!");
+#else
 			printf(BOLD RED REVERSE BLINK "%-12s" RESET, "!!!!!!");
+#endif
 			break;
 		}
 		switch(table->columns[i].FKtarget[0])
 		{
 		case '\0':
+#ifdef NO_COLOR
+			printf("%-38s", "independent");
+#else
 			printf(BOLD GREEN "%-38s" RESET, "independent");
+#endif
 			break;
 		default:
+#ifdef NO_COLOR
+			printf("->%-36s", table->columns[i].FKtarget);
+#else
 			printf(BOLD YELLOW "->%-36s" RESET, table->columns[i].FKtarget);
+#endif
 			break;
 		}
 		switch(table->columns[i].defaultValue.data[0])
 		{
 		case '\0':
+#ifdef NO_COLOR
+			printf("no default value");
+#else
 			printf(BOLD GREEN "no default value" RESET);
+#endif
 			break;
 		default:
+#ifdef NO_COLOR
+			printf("default value: %s", table->columns[i].defaultValue.data);
+#else
 			printf(BOLD MAGENTA "default value: %s" RESET, table->columns[i].defaultValue.data);
+#endif
 			break;
 		}
 		printf("\n");

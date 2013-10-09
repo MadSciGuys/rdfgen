@@ -2,7 +2,7 @@
 # twhitak@its.jnj.com
 
 CC = clang
-CFLAGS = -Wall -Wextra -pedantic -O2
+CFLAGS = -Wall -Wextra -pedantic -O2 #-DNO_COLOR -DNO_TIME
 INCLUDE = -I./include
 EXECUTABLE = rdfgen
 LINKARGS = -lrt
