@@ -23,7 +23,7 @@ int getTableName(char *inputfilename, char *outputfilename, table_t *table)
 {
 	for(unsigned int i = 0; i < MAX_TABLE_NAME_LEN + 1; i++)
 	{
-		if(*(inputfilename + i) == '.')
+		if(*(inputfilename + i) == '.' || *(inputfilename + i) == '\0')
 		{
 			table->tableName[i] = '\0';
 			break;
