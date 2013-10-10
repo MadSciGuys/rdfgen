@@ -2,9 +2,11 @@
 # twhitak@its.jnj.com
 
 CC = clang
+                                     # Uncomment these to disable time measurement and/or color output:
 CFLAGS = -Wall -Wextra -pedantic -O2 #-DNO_COLOR -DNO_TIME
 INCLUDE = -I./include
 EXECUTABLE = rdfgen
+           # If you disabled time measurement above it is safe to comment this out:
 LINKARGS = -lrt
 
 all: interface.o parser.o generator.o

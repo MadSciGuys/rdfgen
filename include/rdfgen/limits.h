@@ -5,17 +5,7 @@
 #define LIMITS_H
 
 /*
- * Here we define program-wide limits that vary according to the environment
- * and application. We've chosen default parameters for processing CSV files
- * sourced from Oracle tables on a UNIX-like machine. Note that these are
- * compiler macros, NOT variables. They are simply found and replaced in the
- * source code text at compile time. These can be easily identified in the
- * source by their capitalization and use of underscores. All field lengths
- * are in bytes and disregarding the terminating null byte(where applicable).
- */
-
-/*
- * DON'T try to be clever and large powers of two here with the hope of
+ * DON'T try to be clever and put large powers of two here with the hope of
  * optimizing MMU instructions. The allocator will do this for you if it makes
  * sense. These limits are intended to be used for data-curation purposes.
  */
