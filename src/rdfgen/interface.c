@@ -133,7 +133,7 @@ int getColumnNames(char *inputfile_map, table_t *table)
 				}
 				break;
 			}
-			if(table->columns[column].columnName[MAX_COLUMN_NAME_LEN + 1] != '\0')
+			if(table->columns[column].columnName[MAX_COLUMN_NAME_LEN] != '\0')
 			{
 #ifdef NO_COLOR
 				printf("Input file error!\nName of column %d in table %s is too long.\n", (column + 1), table->tableName);
