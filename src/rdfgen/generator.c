@@ -87,6 +87,7 @@ static int readRow(char *inputfile_map, unsigned long int *cursor, field_t *row_
 			_cursor++;
 			break;
 		}
+	}
 	return 1;
 }
 
