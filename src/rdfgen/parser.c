@@ -10,10 +10,7 @@
 #include <rdfgen/interface.h>
 #include <rdfgen/parser.h>
 #include <rdfgen/structure.h>
-
-#ifndef NO_COLOR
 #include <rdfgen/color.h>
-#endif
 
 // This function seeks to the target table in the schema file, leaving the
 // cursor on the tab after the newline. Return 1 upon error, 0 otherwise:
@@ -29,11 +26,7 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned long int *cursor)
 			{
 				if(*(schemafile_map + _cursor) == '\0')
 				{
-#ifdef NO_COLOR
-					printf("Schema file error!\nUnexpected EOF at position 0x%x\n", (unsigned int)_cursor);
-#else
 					printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, (unsigned int)_cursor);
-#endif
 					return 1;
 				}
 				_cursor++;
@@ -51,11 +44,7 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned long int *cursor)
 					*cursor = _cursor;
 					if(*(schemafile_map + *cursor) != '\t')
 					{
-#ifdef NO_COLOR
-						printf("Schema file error!\nMalformed line at position 0x%x found by schemaSeek()\n", (unsigned int)(*cursor));
-#else
 						printf(BOLD RED "Schema file error!\nMalformed line at position 0x%x found by schemaSeek()\n" RESET, (unsigned int)(*cursor));
-#endif
 						return 1;
 					}
 					return 0;
@@ -70,11 +59,7 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned long int *cursor)
 					{
 						if(*(schemafile_map + _cursor) == '\0')
 						{
-#ifdef NO_COLOR
-							printf("Schema file error!\nUnexpected EOF at position 0x%x\n", (unsigned int)_cursor);
-#else
 							printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, (unsigned int)_cursor);
-#endif
 							break;
 						}
 						_cursor++;
@@ -86,19 +71,11 @@ int schemaSeek(char *schemafile_map, char *tableName, unsigned long int *cursor)
 		}
 		else
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nFound line that does not begin with '!' or tab\n");
-#else
 			printf(BOLD RED "Schema file error!\nFound line that does not begin with '!' or tab\n" RESET);
-#endif
 			return 1;
 		}
 	}
-#ifdef NO_COLOR
-	printf("Schema file error!\nTable %s not found in schema file.\n", tableName);
-#else
 	printf(BOLD RED "Schema file error!\nTable %s not found in schema file.\n" RESET, tableName);
-#endif
 	return 1;
 }
 
@@ -115,16 +92,8 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 
 	if(*(schemafile_map + _cursor) != '!')
 	{
-#ifdef NO_COLOR
-		printf("Schema file error!\nNo Primary Identifier defined in schema file for table %s\n", table->tableName);
-#else
 		printf(BOLD RED "Schema file error!\nNo Primary Identifier defined in schema file for table %s\n" RESET, table->tableName);
-#endif
-#ifdef NO_COLOR
-		printf("Found [[[%c]]] instead...\n", *(schemafile_map + _cursor));
-#else
 		printf(BOLD YELLOW "Found [[[%c]]] instead...\n" RESET, *(schemafile_map + _cursor));
-#endif
 		return 1;
 	}
 	_cursor++;
@@ -134,11 +103,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 		_cursor++;
 		if(*(schemafile_map + _cursor) != '\n')
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nUnexpected char at position 0x%x\n", (unsigned int)_cursor);
-#else
 			printf(BOLD RED "Schema file error!\nUnexpected char at position 0x%x\n" RESET, (unsigned int)_cursor);
-#endif
 			return 1;
 		}
 		_cursor++;
@@ -159,11 +124,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 		}
 		else if(*(schemafile_map + _cursor) == '\0')
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nUnexpected EOF at position 0x%x\n", _cursor);
-#else
 			printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, _cursor);
-#endif
 			return 1;
 		}
 		else
@@ -174,11 +135,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 	}
 	if(PIname[MAX_COLUMN_NAME_LEN] != '\0')
 	{
-#ifdef NO_COLOR
-		printf("Schema file error!\nTable %s: Primary Identifier too long.\n", table->tableName);
-#else
 		printf(BOLD RED "Schema file error!\nTable %s: Primary Identifier too long.\n" RESET, table->tableName);
-#endif
 		return 1;
 	}
 	for(unsigned int i = 0; i < MAX_COLUMNS; i++)
@@ -192,11 +149,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 	}
 	if(table->primaryIdentifier == -2)
 	{
-#ifdef NO_COLOR
-		printf("Schema file error!\nTable %s: Primary Identifier %s not found in table file.\n", table->tableName,PIname);
-#else
 		printf(BOLD RED "Schema file error!\nTable %s: Primary Identifier %s not found in table file.\n" RESET, table->tableName,PIname);
-#endif
 		return 1;
 	}
 	if(*(schemafile_map + _cursor) == '\n')
@@ -217,11 +170,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 			}
 			else if(*(schemafile_map + _cursor) == '\0')
 			{
-#ifdef NO_COLOR
-				printf("Schema file error!\nUnexpected EOF at position 0x%x\n", (unsigned int)_cursor);
-#else
 				printf(BOLD RED "Schema file error!\nUnexpected EOF at position 0x%x\n" RESET, (unsigned int)_cursor);
-#endif
 				return 1;
 			}
 			else
@@ -232,11 +181,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 		}
 		if(FKname[MAX_TABLE_NAME_LEN] != '\0')
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nTable %s: Foreign Key for Primary Identifier %s is too long.\n", table->tableName, table->columns[table->primaryIdentifier].columnName);
-#else
 			printf(BOLD RED "Schema file error!\nTable %s: Foreign Key for Primary Identifier %s is too long.\n" RESET, table->tableName, table->columns[table->primaryIdentifier].columnName);
-#endif
 			return 1;
 		}
 		strncpy(table->columns[table->primaryIdentifier].FKtarget,FKname,MAX_TABLE_NAME_LEN + 1);
@@ -246,11 +191,7 @@ int schemaPI(char *schemafile_map, table_t *table, unsigned long int *cursor)
 	}
 	else
 	{
-#ifdef NO_COLOR
-	printf("Schema file error!\nUnexpected char at position 0x%x\n", _cursor);
-#else
 	printf(BOLD RED "Schema file error!\nUnexpected char at position 0x%x\n" RESET, _cursor);
-#endif
 	return 1;
 	}
 }
@@ -272,11 +213,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 		}
 		else
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nMalformed line at position 0x%x found by schemaFetchLine()\n", (unsigned int)_cursor);
-#else
 			printf(BOLD RED "Schema file error!\nMalformed line at position 0x%x found by schemaFetchLine()\n" RESET, (unsigned int)_cursor);
-#endif
 			return 1;
 		}
 	}
@@ -285,20 +222,12 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 	{
 		if(*(schemafile_map + _cursor) == '!')
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nUnexpected '!' at position 0x%x\n", (unsigned int)_cursor);
-#else
 			printf(BOLD RED "Schema file error!\nUnexpected '!' at position 0x%x\n" RESET, (unsigned int)_cursor);
-#endif
 			return 1;
 		}
 		else if(*(schemafile_map + _cursor) == '\n')
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nUnexpected line feed at position 0x%x\n", (unsigned int)_cursor);
-#else
 			printf(BOLD RED "Schema file error!\nUnexpected line feed at position 0x%x\n" RESET, (unsigned int)_cursor);
-#endif
 			return 1;
 		}
 		else if(*(schemafile_map + _cursor) == '>' || *(schemafile_map + _cursor) == '?' || *(schemafile_map + _cursor) == '*' || *(schemafile_map + _cursor) == '@' || *(schemafile_map + _cursor) == '&')
@@ -329,11 +258,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 		}
 		else
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nInitial argument too long.\n");
-#else
 			printf(BOLD RED "Schema file error!\nInitial argument too long.\n" RESET);
-#endif
 			return 1;
 		}
 	}
@@ -347,11 +272,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 		}
 		else if(*(schemafile_map + _cursor) == '!' || *(schemafile_map + _cursor) == '>' || *(schemafile_map + _cursor) == '?' || *(schemafile_map + _cursor) == '*' || *(schemafile_map + _cursor) == '@' || *(schemafile_map + _cursor) == '&')
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nToo many arguments!\n");
-#else
 			printf(BOLD RED "Schema file error!\nToo many arguments!\n" RESET);
-#endif
 			return 1;
 		}
 		else
@@ -364,11 +285,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 	{
 		if(arg2[MAX_COLUMN_NAME_LEN] != '\0')
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nNew name for column %s is too long.\n", arg1);
-#else
 			printf(BOLD RED "Schema file error!\nNew name for column %s is too long.\n" RESET, arg1);
-#endif
 			return 1;
 		}
 	}
@@ -376,11 +293,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 	{
 		if(arg2[MAX_FIELD_LEN] != '\0')
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nDefault value for column %s is too long.\n", arg1);
-#else
 			printf(BOLD RED "Schema file error!\nDefault value for column %s is too long.\n" RESET, arg1);
-#endif
 			return 1;
 		}
 	}
@@ -388,11 +301,7 @@ int schemaFetchLine(char *schemafile_map, char *op, char *arg1, char *arg2, unsi
 	{
 		if(arg2[MAX_TABLE_NAME_LEN] != '\0')
 		{
-#ifdef NO_COLOR
-			printf("Schema file error!\nForeign Key target name for column %s is too long.\n", arg1);
-#else
 			printf(BOLD RED "Schema file error!\nForeign Key target name for column %s is too long.\n" RESET, arg1);
-#endif
 			return 1;
 		}
 	}
@@ -423,11 +332,7 @@ int renameColumn(char *arg1, char *arg2, table_t *table)
 	}
 	if(colnum == -1)
 	{
-#ifdef NO_COLOR
-		printf("Column rename error!\nColumn name %s not found in table %s\n", arg1, table->tableName);
-#else
 		printf(BOLD RED "Column rename error!\nColumn name %s not found in table %s\n" RESET, arg1, table->tableName);
-#endif
 		return 1;
 	}
 	else
@@ -453,20 +358,12 @@ int defineDV(char *arg1, char *arg2, table_t *table)
 	}
 	if(colnum == -1)
 	{
-#ifdef NO_COLOR
-		printf("Column default value assignment error!\nColumn name %s not found in table %s\n", arg1, table->tableName);
-#else
 		printf(BOLD RED "Column default value assignment error!\nColumn name %s not found in table %s\n" RESET, arg1, table->tableName);
-#endif
 		return 1;
 	}
 	else if(colnum == table->primaryIdentifier)
 	{
-#ifdef NO_COLOR
-		printf("Column default value assignment error!\nColumn %s is the Primary Identifier and cannot have a default value.\n", arg1);
-#else
 		printf(BOLD RED "Column default value assignment error!\nColumn %s is the Primary Identifier and cannot have a default value.\n" RESET, arg1);
-#endif
 		return 1;
 	}
 	else
@@ -493,20 +390,12 @@ int requireColumn(char *arg1, table_t *table)
 	}
 	if(colnum == -1)
 	{
-#ifdef NO_COLOR
-		printf("Column requirement spec error!\nColumn name %s not found in table %s\n", arg1, table->tableName);
-#else
 		printf(BOLD RED "Column requirement spec error!\nColumn name %s not found in table %s\n" RESET, arg1, table->tableName);
-#endif
 		return 1;
 	}
 	else if(colnum == table->primaryIdentifier)
 	{
-#ifdef NO_COLOR
-		printf("Column requirement spec error!\nColumn %s is the Primary Identifier and has a static type.\n", arg1);
-#else
 		printf(BOLD RED "Column requirement spec error!\nColumn %s is the Primary Identifier and has a static type.\n" RESET, arg1);
-#endif
 		return 1;
 	}
 	else
@@ -530,11 +419,7 @@ int defineFK(char *arg1, char *arg2, table_t *table)
 	}
 	if(colnum == -1)
 	{
-#ifdef NO_COLOR
-		printf("Column FK target assignment error!\nColumn name %s not found in table %s\n", arg1, table->tableName);
-#else
 		printf(BOLD RED "Column FK target assignment error!\nColumn name %s not found in table %s\n" RESET, arg1, table->tableName);
-#endif
 		return 1;
 	}
 	else
@@ -551,11 +436,7 @@ int defineVC(char *arg1, char *arg2, table_t *table)
 {
 	if((table->totalColumns + 1) > MAX_COLUMNS)
 	{
-#ifdef NO_COLOR
-		printf("Virtual column definition error!\nMAX_COLUMNS EXCEEDED!\n");
-#else
 		printf(BOLD RED "Virtual column definition error!\n" REVERSE BLINK "MAX_COLUMNS EXCEEDED!\n" RESET);
-#endif
 		return 1;
 	}
 	table->totalColumns = (table->totalColumns + 1);
