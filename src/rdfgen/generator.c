@@ -64,31 +64,29 @@ static int readRow(char *inputfile_map, unsigned long int *cursor, field_t *row_
 	unsigned long int _cursor = 0;
 	for(unsigned long int i = *cursor; i < (((MAX_FIELD_LEN + 1) * MAX_COLUMNS) + *cursor); i++)
 	{
-		if(*(inputfile_map + i) == '\n')
+		switch(*(inputfile_map + i))
 		{
+		case '\n':
 			(row_buffer + cell)->data[_cursor] = '\0';
 			i++;
 			*cursor = i;
 			return 0;
-		}
-		else if(*(inputfile_map + i) == '\0')
-		{
+			break;
+		case '\0':
 			(row_buffer + cell)->data[_cursor] = '\0';
 			*cursor = i;
 			return 0;
-		}
-		else if(*(inputfile_map + i) == ',')
-		{
+			break;
+		case ',':
 			(row_buffer + cell)->data[_cursor] = '\0';
 			_cursor = 0;
 			cell++;
-		}
-		else
-		{
+			break;
+		default:
 			(row_buffer + cell)->data[_cursor] = *(inputfile_map + i);
 			_cursor++;
+			break;
 		}
-	}
 	return 1;
 }
 
