@@ -2,12 +2,22 @@
 # twhitak@its.jnj.com
 
 CC = clang
-                                     # Uncomment these to disable time measurement and/or color output:
-CFLAGS = -Wall -Wextra -pedantic -O2 #-DNO_COLOR -DNO_TIME
+CFLAGS = -Wall -Wextra -pedantic -O2
 INCLUDE = -I./include
 EXECUTABLE = rdfgen
-           # If you disabled time measurement above it is safe to comment this out:
-LINKARGS = -lrt
+LINKARGS =
+COLOR = yes
+TIME = yes
+
+ifeq ($(COLOR),no)
+CFLAGS += -DNO_COLOR
+endif
+
+ifeq ($(TIME),no)
+CFLAGS += -DNO_TIME
+else
+LINKARGS += -lrt
+endif
 
 all: interface.o parser.o generator.o
 	$(CC) $(CFLAGS) $(INCLUDE)  -o $(EXECUTABLE) src/main.c interface.o parser.o generator.o $(LINKARGS)
