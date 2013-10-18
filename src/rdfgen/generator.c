@@ -103,13 +103,13 @@ void genTriples_anon_leaf(char *inputfile_map, unsigned long int *cursor, FILE *
 			// Is column virtual?
 			if(table->columns[i].type == virt)
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, must it?
@@ -118,7 +118,7 @@ void genTriples_anon_leaf(char *inputfile_map, unsigned long int *cursor, FILE *
 				// If it must, is there a default value?
 				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX,  table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 				// In not, warn the user:
@@ -130,7 +130,7 @@ void genTriples_anon_leaf(char *inputfile_map, unsigned long int *cursor, FILE *
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -153,12 +153,12 @@ void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
@@ -168,12 +168,12 @@ void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
@@ -186,12 +186,12 @@ void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 						(*triples)++;
 					}
 					else
 					{
-						fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 						(*triples)++;
 					}
 				}
@@ -204,7 +204,7 @@ void genTriples_anon(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX,  table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 		}
@@ -234,13 +234,13 @@ void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 			// Is column virtual?
 			else if(table->columns[i].type == virt)
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, must it?
@@ -249,7 +249,7 @@ void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				// If it must, is there a default value?
 				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX,  table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 				// In not, warn the user:
@@ -261,7 +261,7 @@ void genTriples_leaf(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 		}
@@ -294,12 +294,12 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 
 				}
@@ -310,12 +310,12 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
@@ -328,12 +328,12 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 						(*triples)++;
 					}
 					else
 					{
-						fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 						(*triples)++;
 					}
 				}
@@ -346,7 +346,7 @@ void genTriples(char *inputfile_map, unsigned long int *cursor, FILE *outputfile
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -379,12 +379,12 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX,  table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
@@ -394,12 +394,12 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s_%s>\n", PREFIX,  table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
@@ -412,12 +412,12 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX,  table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 						(*triples)++;
 					}
 					else
 					{
-						fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 						(*triples)++;
 					}
 				}
@@ -430,7 +430,7 @@ void genTriples_pifk(char *inputfile_map, unsigned long int *cursor, FILE *outpu
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -456,7 +456,7 @@ void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned long int *cursor
 			// Does it have a value?
 			if((row_buffer + i)->data[0] != '\0')
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, must it?
@@ -465,7 +465,7 @@ void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned long int *cursor
 				// If it must, is there a default value?
 				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 				// In not, warn the user:
@@ -477,7 +477,7 @@ void genTriples_anon_leaf_no_virt(char *inputfile_map, unsigned long int *cursor
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -500,12 +500,12 @@ void genTriples_anon_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
@@ -518,12 +518,12 @@ void genTriples_anon_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 						(*triples)++;
 					}
 					else
 					{
-						fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 						(*triples)++;
 					}
 				}
@@ -536,7 +536,7 @@ void genTriples_anon_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -566,7 +566,7 @@ void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, must it?
@@ -575,7 +575,7 @@ void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 				// If it must, is there a default value?
 				if(table->columns[i].defaultValue.data[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 				// In not, warn the user:
@@ -587,7 +587,7 @@ void genTriples_leaf_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -620,12 +620,12 @@ void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *ou
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
@@ -638,12 +638,12 @@ void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *ou
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 						(*triples)++;
 					}
 					else
 					{
-						fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 						(*triples)++;
 					}
 				}
@@ -656,7 +656,7 @@ void genTriples_no_virt(char *inputfile_map, unsigned long int *cursor, FILE *ou
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -689,12 +689,12 @@ void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
@@ -707,12 +707,12 @@ void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 					// Is it a foreign key?
 					if(table->columns[i].FKtarget[0] != '\0')
 					{
-						fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+						fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 						(*triples)++;
 					}
 					else
 					{
-						fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+						fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 						(*triples)++;
 					}
 				}
@@ -725,7 +725,7 @@ void genTriples_pifk_no_virt(char *inputfile_map, unsigned long int *cursor, FIL
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -751,19 +751,19 @@ void genTriples_anon_leaf_no_req(char *inputfile_map, unsigned long int *cursor,
 			// Is column virtual?
 			if(table->columns[i].type == virt)
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -786,12 +786,12 @@ void genTriples_anon_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
@@ -801,19 +801,19 @@ void genTriples_anon_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -843,19 +843,19 @@ void genTriples_leaf_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 			// Is column virtual?
 			else if(table->columns[i].type == virt)
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -888,12 +888,12 @@ void genTriples_no_req(char *inputfile_map, unsigned long int *cursor, FILE *out
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
@@ -903,19 +903,19 @@ void genTriples_no_req(char *inputfile_map, unsigned long int *cursor, FILE *out
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -948,12 +948,12 @@ void genTriples_pifk_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, table->columns[i].defaultValue.data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, table->columns[i].defaultValue.data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
@@ -963,19 +963,19 @@ void genTriples_pifk_no_req(char *inputfile_map, unsigned long int *cursor, FILE
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -1001,13 +1001,13 @@ void genTriples_anon_leaf_no_virt_no_req(char *inputfile_map, unsigned long int 
 			// Does it have a value?
 			if((row_buffer + i)->data[0] != '\0')
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -1030,19 +1030,19 @@ void genTriples_anon_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -1072,13 +1072,13 @@ void genTriples_leaf_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 			// If not, does it have a value?
 			else if((row_buffer + i)->data[0] != '\0')
 			{
-				fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples)++;
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -1111,19 +1111,19 @@ void genTriples_no_virt_no_req(char *inputfile_map, unsigned long int *cursor, F
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
@@ -1156,19 +1156,19 @@ void genTriples_pifk_no_virt_no_req(char *inputfile_map, unsigned long int *curs
 				// Is it a foreign key?
 				if(table->columns[i].FKtarget[0] != '\0')
 				{
-					fprintf(outputfile, "  <%s:%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
+					fprintf(outputfile, "  <%s:%s_%s rdf:resource=\"%s#%s_%s\"/>\n", PREFIX, table->tableName, table->columns[i].columnName, BASE, table->columns[i].FKtarget, (row_buffer + i)->data);
 					(*triples)++;
 				}
 				else
 				{
-					fprintf(outputfile, "  <%s:%s>%s</%s:%s>\n", PREFIX, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->columns[i].columnName);
+					fprintf(outputfile, "  <%s:%s_%s>%s</%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, (row_buffer + i)->data, PREFIX, table->tableName, table->columns[i].columnName);
 					(*triples)++;
 				}
 			}
 			// If not, write nil:
 			else
 			{
-				fprintf(outputfile, "  <%s:%s><rdf:nil/></%s:%s>\n", PREFIX, table->columns[i].columnName, PREFIX, table->columns[i].columnName);
+				fprintf(outputfile, "  <%s:%s_%s><rdf:nil/></%s:%s_%s>\n", PREFIX, table->tableName, table->columns[i].columnName, PREFIX, table->tableName, table->columns[i].columnName);
 				(*triples) += 2;
 			}
 		}
