@@ -8,6 +8,7 @@ EXECUTABLE = rdfgen
 LINKARGS =
 COLOR = yes
 TIME = yes
+INSTALLDIR = /usr/local/bin/
 
 ifeq ($(COLOR),no)
 CFLAGS += -DNO_COLOR
@@ -32,10 +33,10 @@ generator.o:
 	$(CC) -c $(CFLAGS) $(INCLUDE) src/rdfgen/generator.c
 
 install:
-	cp $(EXECUTABLE) /usr/local/bin/
+	cp $(EXECUTABLE) $(INSTALLDIR)
 
 uninstall:
-	rm -f /usr/local/bin/$(EXECUTABLE)
+	rm -f $(INSTALLDIR)$(EXECUTABLE)
 
 clean:
 	rm -f *.o
